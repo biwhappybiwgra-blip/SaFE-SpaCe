@@ -316,16 +316,12 @@ provinces.forEach(([val,label])=>{
 });
 
 const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([13.2, 101.0], 6);
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-  maxZoom: 19, attribution: 'Tiles &copy; Esri'
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  maxZoom: 19,
+  attribution: '&copy; OpenStreetMap &copy; CARTO'
 }).addTo(map);
 
-(function tintMapGreen(){
-  const tilePane = map.getPane('tilePane');
-  const tint = document.createElement('div');
-  tint.style.cssText = 'position:absolute;inset:0;background:#6A8E72;mix-blend-mode:color;pointer-events:none;';
-  tilePane.appendChild(tint);
-})();
 
 const ratchaburiOutline = [
   [13.90,99.75],[13.85,99.95],[13.70,100.05],[13.45,100.05],[13.20,99.95],
