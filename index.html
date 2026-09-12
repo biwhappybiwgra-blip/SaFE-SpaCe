@@ -497,7 +497,15 @@ function applyFilters(){
   });
 }
 
-const verifiedByMe = new Set(); // TODO: FIREBASE — เช็ค doc ใน collection "verifications" ตาม userId+placeId แทน
+const verifiedByMe = new Set(); const firebaseConfig = {
+  apiKey: "AIzaSyB8YtSJcYh-8EeYkLDF9lo-XQKj884WIjM",
+  authDomain: "project501-dd958.firebaseapp.com",
+  projectId: "project501-dd958",
+  storageBucket: "project501-dd958.firebasestorage.app",
+  messagingSenderId: "256045341561",
+  appId: "1:256045341561:web:a67e560b81526adf916da8",
+  measurementId: "G-9WKP21SH2T"
+};
 
 // ---------- Detail sheet ----------
 let currentId = null;
