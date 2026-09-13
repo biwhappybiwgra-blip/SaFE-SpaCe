@@ -18,26 +18,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* โทนสี Earth Tone: เขียว • น้ำตาล • เหลืองอ่อน */
-    --bg-1: #FAF7F2;            /* ครีมนวล / งาช้าง */
-    --bg-2: #F3ECE1;            /* ทรายนวล / ครีมเข้ม */
-    --yellow-soft: #F9F2DC;     /* เหลืองอ่อนละมุนตา */
-    --yellow-border: #E8DDCA;   /* สีขอบเหลืองนวล */
+    /* โทนสี Earth Tone ปรับปรุงให้อ่านง่าย คมชัด และสบายตา */
+    --bg-1: #FBF9F5;            /* ครีมนวลสว่าง สบายตา */
+    --bg-2: #F4EFE6;            /* ทรายนวล / ครีมเข้ม */
+    --yellow-soft: #FFF9EB;     /* เหลืองอ่อนเนย นุ่มนวล สะอาดตา */
+    --yellow-border: #E8DECD;   /* สีขอบครีมบางเบา */
     
-    --sage: #4D704C;            /* เขียวใบไม้สงบ สบายตา */
-    --sage-dark: #3B573A;
-    --sage-light: #E8F0E7;       /* เขียวพาสเทลอ่อนสำหรับพื้นหลัง Badge */
+    --sage: #386641;            /* เขียวธรรมชาติ สงบและคมชัดขึ้น */
+    --sage-dark: #2B4E32;
+    --sage-light: #EBF4EC;      /* เขียวพาสเทลสำหรับพื้นหลัง Badge */
 
-    --brown: #7A4F28;           /* น้ำตาลไม้อบอุ่น */
-    --brown-dark: #5C3A1C;
+    --brown: #754C29;           /* น้ำตาลไม้อบอุ่น ชัดเจน */
+    --brown-dark: #5C3A1E;
     
-    --ink: #332822;             /* น้ำตาลเข้มกาแฟ อ่านง่าย สบายตากว่าดำสนิท */
-    --ink-subtle: #7A7067;      /* สีข้อความรอง */
-    --rust: #B24C3D;            /* ส้มอิฐเตือนภัย */
-    --pin-unverified: #A89F91;  /* น้ำตาลอมเทา */
+    --ink: #221C18;             /* น้ำตาลเข้มเอสเพรสโซ่ คมชัด อ่านง่ายมาก ไม่แสบตา */
+    --ink-subtle: #6E6359;      /* สีข้อความรอง */
+    --rust: #B84A39;            /* ส้มอิฐธรรมชาติ */
+    --pin-unverified: #A49B8D;  /* เทาอมน้ำตาล */
     
     --radius: 18px;
-    --shadow: 0 8px 24px rgba(51, 40, 34, 0.08);
+    --shadow: 0 4px 18px rgba(34, 28, 24, 0.08);
   }
 
   *{box-sizing:border-box;}
@@ -47,17 +47,17 @@
   svg.ic{ width:16px; height:16px; flex:0 0 auto; }
 
   header{ position:absolute; top:0; left:0; right:0; z-index:1000; padding:14px 16px 10px;
-    background:linear-gradient(180deg, rgba(250,247,242,0.96) 65%, rgba(250,247,242,0)); pointer-events:none; }
+    background:linear-gradient(180deg, rgba(251,249,245,0.96) 65%, rgba(251,249,245,0)); pointer-events:none; }
   header > *{ pointer-events:auto; }
   .top-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
   .brand{ display:flex; align-items:center; gap:8px; font-family:'Mali', sans-serif; font-weight:700; font-size:21px; color:var(--ink); }
-  .brand .dot{ width:11px;height:11px;border-radius:50%; background:var(--sage); box-shadow:0 0 0 4px rgba(77,112,76,0.2); }
+  .brand .dot{ width:11px;height:11px;border-radius:50%; background:var(--sage); box-shadow:0 0 0 4px rgba(56,102,65,0.18); }
   .select-group{ display:flex; gap:8px; flex-wrap:wrap; }
   
   select{ font-family:'Sarabun',sans-serif; font-size:13.5px; font-weight:600; color:var(--ink); background:#fff;
     border:1px solid var(--yellow-border); border-radius:999px; padding:9px 16px; box-shadow:var(--shadow);
     cursor:pointer; appearance:none; min-height:44px;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237A4F28'/%3E%3C/svg%3E");
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23754C29'/%3E%3C/svg%3E");
     background-repeat:no-repeat; background-position:right 14px center; padding-right:32px; max-width:180px; }
   select:focus-visible{ outline:2px solid var(--brown); outline-offset:2px; }
 
@@ -70,22 +70,22 @@
   .filters{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
   .filters::-webkit-scrollbar{display:none;}
   
-  /* ฟิลเตอร์ชิปโทนเหลืองอ่อน สบายตา */
+  /* ตัวกรองชิปโทนเหลืองอ่อน สว่าง สบายตา อ่านตัวหนังสือชัด */
   .chip{ flex:0 0 auto; display:flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600; color:var(--ink);
     background:var(--yellow-soft); border:1px solid var(--yellow-border); border-radius:999px; padding:9px 14px; min-height:44px;
-    cursor:pointer; user-select:none; box-shadow:0 2px 8px rgba(51,40,34,0.06);
+    cursor:pointer; user-select:none; box-shadow:0 2px 8px rgba(34,28,24,0.05);
     transition:all .15s ease; }
   .chip svg{ fill:var(--brown); }
   .chip.active{ background:var(--sage); border-color:var(--sage); color:#fff; }
   .chip.active svg{ fill:#fff; }
   .chip:focus-visible{ outline:2px solid var(--brown); outline-offset:2px; }
 
-  .pin-wrap{ display:flex; flex-direction:column; align-items:center; filter:drop-shadow(0 4px 6px rgba(51,40,34,0.3)); }
+  .pin-wrap{ display:flex; flex-direction:column; align-items:center; filter:drop-shadow(0 3px 6px rgba(34,28,24,0.3)); }
   .pin-wrap svg{ display:block; }
   .user-dot{ width:16px; height:16px; border-radius:50%; background:#3B82F6; border:3px solid #fff;
     box-shadow:0 0 0 5px rgba(59,130,246,0.28); }
 
-  #sheet{ position:absolute; z-index:1100; background:#fff; box-shadow:var(--shadow); padding:20px;
+  #sheet{ position:absolute; z-index:1100; background:#fff; box-shadow:0 8px 32px rgba(34,28,24,0.12); padding:20px;
     transform:translateY(120%); transition:transform .32s cubic-bezier(.32,.72,0,1); overflow-y:auto;
     border:1px solid var(--yellow-border); }
   #sheet.open{ transform:translateY(0); }
@@ -95,19 +95,19 @@
   
   .status-badge{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700;
     padding:5px 12px; border-radius:999px; margin-bottom:10px; }
-  .status-badge.verified{ background:var(--sage-light); color:var(--sage-dark); border:1px solid rgba(77,112,76,0.2); }
+  .status-badge.verified{ background:var(--sage-light); color:var(--sage); border:1px solid rgba(56,102,65,0.18); }
   .status-badge.unverified{ background:var(--bg-2); color:var(--ink-subtle); }
-  .status-badge.disputed{ background:rgba(178,76,61,0.12); color:var(--rust); }
+  .status-badge.disputed{ background:rgba(184,74,57,0.12); color:var(--rust); }
 
   #sheet h2{ font-family:'Mali',sans-serif; font-weight:700; font-size:19px; margin:0 0 4px; padding-right:34px; color:var(--ink); }
   #sheet .cat{ font-size:12.5px; color:var(--brown); font-weight:600; margin-bottom:10px; }
-  #sheet .desc{ font-size:14px; line-height:1.6; color:#4F463E; margin-bottom:12px; }
+  #sheet .desc{ font-size:14px; line-height:1.6; color:#443C36; margin-bottom:12px; }
   #sheetPhoto{ width:100%; max-height:150px; object-fit:cover; border-radius:12px; margin-bottom:12px; display:none; }
   
   .pill-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; min-height:20px; }
   .pill{ display:flex; align-items:center; gap:5px; font-size:12.5px; font-weight:600; background:var(--yellow-soft);
     border:1px solid var(--yellow-border); color:var(--ink); padding:6px 12px; border-radius:999px; }
-  .pill svg{ fill:var(--sage-dark); }
+  .pill svg{ fill:var(--sage); }
   .pill-empty{ font-size:12.5px; color:var(--ink-subtle); }
   
   .votes{ font-size:13px; color:var(--ink-subtle); margin:8px 0 14px; }
@@ -133,13 +133,13 @@
   .tag-grid{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px; }
   .tag-check{ display:flex; align-items:center; gap:6px; font-size:13px; background:var(--yellow-soft);
     border:1px solid var(--yellow-border); padding:7px 12px; border-radius:999px; cursor:pointer; }
-  .tag-check svg{ fill:var(--sage-dark); }
+  .tag-check svg{ fill:var(--sage); }
   
-  .btn-save-tags{ background:var(--brown-dark); color:#fff; width:100%; margin-bottom:18px; }
-  .btn-save-tags:hover{ filter:brightness(1.1); }
+  .btn-save-tags{ background:var(--brown); color:#fff; width:100%; margin-bottom:18px; }
+  .btn-save-tags:hover{ background:var(--brown-dark); }
 
   .comment-item{ background:var(--bg-1); border:1px solid var(--yellow-border); border-radius:12px; padding:10px 12px; margin-bottom:8px; }
-  .comment-item .cname{ font-size:12.5px; font-weight:700; color:var(--sage-dark); }
+  .comment-item .cname{ font-size:12.5px; font-weight:700; color:var(--sage); }
   .comment-item .ctext{ font-size:13.5px; margin-top:2px; color:var(--ink); }
   
   .comment-form{ display:flex; gap:8px; margin-top:8px; }
@@ -170,12 +170,12 @@
   .nearby-item:last-child{ border-bottom:none; }
   .nearby-item .ni-name{ font-size:13.5px; font-weight:700; color:var(--ink); }
   .nearby-item .ni-cat{ font-size:12px; color:var(--brown); margin-top:2px; }
-  .nearby-item .ni-dist{ font-size:12.5px; font-weight:700; color:var(--sage-dark); white-space:nowrap; }
+  .nearby-item .ni-dist{ font-size:12.5px; font-weight:700; color:var(--sage); white-space:nowrap; }
   @media (max-width:768px){ #nearbyPanel{ left:16px; right:16px; width:auto; top:auto; bottom:16px; max-height:46vh; transform:translateY(130%); }
     #nearbyPanel.open{ transform:translateY(0); } }
 
   #searchFab{ position:absolute; right:18px; bottom:24px; z-index:1090; width:54px; height:54px; border-radius:50%;
-    border:none; background:var(--brown); box-shadow:0 6px 18px rgba(122,79,40,0.35); cursor:pointer; display:flex; align-items:center;
+    border:none; background:var(--brown); box-shadow:0 4px 16px rgba(117,76,41,0.35); cursor:pointer; display:flex; align-items:center;
     justify-content:center; transition:transform .15s ease; }
   #searchFab:hover{ transform:scale(1.06); background:var(--brown-dark); }
   #searchFab svg{ fill:none; stroke:#fff; width:22px; height:22px; }
@@ -201,8 +201,8 @@
   #toast.show{ opacity:1; transform:translate(-50%,0); }
   .leaflet-control-zoom{ margin-top:130px !important; }
 
-  /* ปรับโทนสีแผ่นที่ให้ออกสีทรายอบอุ่น Earth Tone สบายตา */
-  .leaflet-tile{ filter: sepia(30%) hue-rotate(345deg) saturate(95%) brightness(1.02); }
+  /* นำฟิลเตอร์สีที่ทำให้แผนที่มัวออก ปล่อยให้แผนที่คมชัด สบายตาที่สุด */
+  .leaflet-tile{ /* คมชัด สะอาดตา */ }
 </style>
 </head>
 <body>
@@ -314,7 +314,7 @@ function categoryGlyph(category){
   }
 }
 
-// ข้อมูลสถานที่
+// ข้อมูลสถานที่ พร้อมร้าน "โกเด้งเส้นกะสั่ง (บ้านสิงห์)"
 let places = [
   { 
     id:'godeng_bansing', 
@@ -369,16 +369,15 @@ provinces.forEach(([val,label])=>{
   provSelect.appendChild(opt);
 });
 
-// เริ่มต้นแผนที่
+// เริ่มต้นแผนที่ MapTiler เดิม
 const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([13.2, 101.0], 6);
 
-// แผนที่หลัก พร้อมตัวสลับอัตโนมัติหาก MapTiler ติดขัด
 const baseLayer = L.tileLayer('https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=heBoKGgYEE6tSt7eXYza', {
-  maxZoom: 19, attribution: '&copy; MapTiler &copy; OpenStreetMap', crossOrigin: true, updateWhenIdle: true
+  maxZoom: 19, attribution: '&copy; MapTiler &copy; OpenStreetMap contributors', crossOrigin: true, updateWhenIdle: true, keepBuffer: 4
 }).addTo(map);
 
 baseLayer.on('tileerror', (e)=>{
-  e.tile.src = `https://tile.openstreetmap.org/${e.coords.z}/${e.coords.x}/${e.coords.y}.png`;
+  setTimeout(()=>{ e.tile.src = e.tile.src; }, 800);
 });
 
 const ratchaburiOutline = [
@@ -387,16 +386,16 @@ const ratchaburiOutline = [
   [13.85,99.20],[13.95,99.50]
 ];
 const worldBigBox = [[-85,-180],[-85,180],[85,180],[85,-180]];
-const maskLayer = L.polygon([worldBigBox, ratchaburiOutline], { stroke:false, fillColor:'#332822', fillOpacity:0.38, interactive:false });
-const outlineLayer = L.polygon(ratchaburiOutline, { color:'#E8DDCA', weight:2.5, fill:false, interactive:false });
+const maskLayer = L.polygon([worldBigBox, ratchaburiOutline], { stroke:false, fillColor:'#221C18', fillOpacity:0.32, interactive:false });
+const outlineLayer = L.polygon(ratchaburiOutline, { color:'#E8DECD', weight:2.5, fill:false, interactive:false });
 
 const markers = {};
 function pinIcon(status, category){
-  // หมุดสี Earth Tone: เขียวธรรมชาติ / ส้มอิฐ / น้ำตาลเทา
-  const fill = status==='verified' ? '#4D704C' : status==='disputed' ? '#B24C3D' : '#A89F91';
+  // หมุดสี Earth Tone: เขียวสงบ / ส้มอิฐ / เทาน้ำตาล
+  const fill = status==='verified' ? '#386641' : status==='disputed' ? '#B84A39' : '#A49B8D';
   const glyph = categoryGlyph(category);
   const svg = `<svg width="30" height="38" viewBox="0 0 30 38" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="15" cy="15" r="13" fill="${fill}" stroke="#FAF7F2" stroke-width="2.5"/>
+    <circle cx="15" cy="15" r="13" fill="${fill}" stroke="#fff" stroke-width="2.5"/>
     <path d="M15 37 L9 21 L21 21 Z" fill="${fill}"/>
     ${glyph}
   </svg>`;
@@ -410,7 +409,7 @@ function renderMarker(p){
   markers[p.id] = m;
 }
 
-// ฟังก์ชันโหลดข้อมูลจาก Firebase
+// โหลดข้อมูลจาก Firebase
 async function loadFromFirebase(){
   try {
     const snapshot = await db.collection('places').get();
@@ -426,7 +425,7 @@ async function loadFromFirebase(){
     });
     places.forEach(renderMarker);
   } catch(e) {
-    console.error("โหลดข้อมูลจาก Firebase ไม่สำเร็จ: ", e);
+    console.warn("ใช้ข้อมูลเริ่มต้นในเครื่อง:", e);
   }
 }
 
@@ -468,7 +467,7 @@ provSelect.addEventListener('change', (e)=>{
     if(map.hasLayer(maskLayer)) map.removeLayer(maskLayer);
     if(map.hasLayer(outlineLayer)) map.removeLayer(outlineLayer);
   }
-  map.flyTo([lat,lng], zoom, { duration: 1.2 });
+  map.flyTo([lat,lng], zoom, { duration: 1.1 });
   closeSheet();
 });
 
@@ -547,13 +546,8 @@ async function verify(id){
   if(p.status==='unverified') p.status='verified';
   
   try {
-    await db.collection('places').doc(id).set({
-      votes: p.votes,
-      status: p.status
-    }, { merge: true });
-  } catch(err) {
-    console.error("บันทึกการยืนยันไม่สำเร็จ:", err);
-  }
+    await db.collection('places').doc(id).set({ votes: p.votes, status: p.status }, { merge: true });
+  } catch(err) { console.error("บันทึกการยืนยันไม่สำเร็จ:", err); }
 
   renderMarker(p);
   openSheet(id);
@@ -577,13 +571,10 @@ document.getElementById('btnSaveTags').addEventListener('click', async ()=>{
   document.querySelectorAll('#editTagGrid input').forEach(cb=>{ p.tags[cb.dataset.key] = cb.checked; });
   
   try {
-    showToast('กำลังบันทึกลงฐานข้อมูล...');
-    await db.collection('places').doc(currentId).set({
-      tags: p.tags
-    }, { merge: true });
+    showToast('กำลังบันทึกลง Firebase...');
+    await db.collection('places').doc(currentId).set({ tags: p.tags }, { merge: true });
     showToast('บันทึกข้อมูลเรียบร้อยแล้ว!');
   } catch(err) {
-    console.error("บันทึกไม่สำเร็จ:", err);
     showToast('บันทึกไม่สำเร็จ');
   }
 
@@ -615,12 +606,8 @@ document.getElementById('commentSend').addEventListener('click', async ()=>{
   p.comments.push({ name:'ผู้ใช้งาน', text });
 
   try {
-    await db.collection('places').doc(currentId).set({
-      comments: p.comments
-    }, { merge: true });
-  } catch(err) {
-    console.error("เซฟคอมเมนต์ไม่สำเร็จ:", err);
-  }
+    await db.collection('places').doc(currentId).set({ comments: p.comments }, { merge: true });
+  } catch(err) {}
 
   input.value = '';
   renderComments(p);
