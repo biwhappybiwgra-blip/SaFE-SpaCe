@@ -319,8 +319,8 @@ provinces.forEach(([val,label])=>{
 });
 
 const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([13.2, 101.0], 6);
-const baseLayer = L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png', {
-  maxZoom: 19, attribution: 'Wikimedia maps | &copy; OpenStreetMap contributors', crossOrigin: true, updateWhenIdle: true, keepBuffer: 4
+const baseLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+  maxZoom: 19, attribution: 'Tiles &copy; Esri', crossOrigin: true, updateWhenIdle: true, keepBuffer: 4
 }).addTo(map);
 // บาง tile อาจโหลดพลาดชั่วคราว (เครือข่าย) — สั่งให้ลองโหลดซ้ำอัตโนมัติแทนที่จะปล่อยว่างค้างไว้
 baseLayer.on('tileerror', (e)=>{
