@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>SaFE SpaCe — แผนที่การเข้าถึงและพื้นที่ปลอดภัย</title>
 <link rel="icon" type="image/png" href="logomap.png">
+
+<!-- 1. ดึง Leaflet CSS (จุดสำคัญที่เคยหายไป) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 
 <!-- นำเข้า Firebase SDK -->
@@ -163,7 +166,6 @@
   #toast.show{ opacity:1; transform:translate(-50%,0); }
   .leaflet-control-zoom{ margin-top:130px !important; }
 
-  /* แก้บั๊กแผนที่เป็นลายตาราง: ทำสีเขียวโทนเดียวด้วย filter (ไม่พึ่ง div ซ้อนที่ขนาดไม่ครอบคลุมทุก tile) */
   .leaflet-tile{ filter: grayscale(100%) sepia(40%) hue-rotate(60deg) saturate(120%) brightness(1.03); }
 </style>
 </head>
@@ -276,8 +278,21 @@ function categoryGlyph(category){
   }
 }
 
-// ข้อมูลเริ่มต้น
+// ข้อมูลสถานที่ พร้อมเพิ่ม "ร้านโกเด้งเส้นกะสั่ง (บ้านสิงห์)" ตามที่คุณต้องการ
 let places = [
+  { 
+    id:'godeng_bansing', 
+    title:'ร้านโกเด้งเส้นกะสั่ง (บ้านสิงห์)', 
+    lat:13.6685, 
+    lng:99.8808, 
+    category:'ก๋วยเตี๋ยว', 
+    desc:'ร้านก๋วยเตี๋ยวชื่อดัง ต.บ้านสิงห์ อ.โพธาราม จ.ราชบุรี มีทางลาดสะดวกสำหรับวีลแชร์ และห้องน้ำ All-Gender / LGBTQ+ เป็นมิตร สะอาด ปลอดภัยสำหรับทุกคน', 
+    photo:null, 
+    tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:false, wide_door:true, has_night_lighting:true }, 
+    status:'verified', 
+    votes:14, 
+    comments:[{ name:'ชาวบ้านสิงห์', text:'ทางลาดขึ้นง่าย ห้องน้ำสะอาดมากครับ' }] 
+  },
   { id:'r1', title:'ครัวคุณต๋อย 1935', lat:13.5363, lng:99.8175, category:'อาหารไทย', desc:'ร้านอาหารไทยชื่อดังติดสถานีรถไฟ อ.เมืองราชบุรี บรรยากาศย้อนยุค', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:true }, status:'verified', votes:8, comments:[] },
   { id:'r2', title:'ตลาดสนามหญ้า', lat:13.5312, lng:99.8121, category:'ตลาด/สตรีทฟู้ด', desc:'แหล่งรวมร้านอาหารอร่อยที่มีชื่อเสียงของ อ.เมืองราชบุรี เปิดตั้งแต่สายจนถึงค่ำ', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
   { id:'r3', title:'เนื้อต้มบ้านสิงห์ เจ๊ติ๋ม', lat:13.5520, lng:99.7800, category:'อาหารไทย', desc:'ร้านเนื้อตุ๋น/เนื้อต้มชื่อดังย่านเขางู ราชบุรี', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
@@ -295,7 +310,7 @@ let places = [
 
 const provinces = [
   ['thailand','🇹🇭 ประเทศไทย (ภาพรวม)', 13.2, 101.0, 6],
-  ['ratchaburi','📍 จ.ราชบุรี', 13.5282, 99.8134, 11],
+  ['ratchaburi','📍 จ.ราชบุรี (บ้านสิงห์)', 13.6685, 99.8808, 14],
   ['กรุงเทพมหานคร',null,13.7563,100.5018,10],['สมุทรปราการ',null,13.5991,100.5998,10],
   ['นนทบุรี',null,13.8621,100.5144,10],['ปทุมธานี',null,14.0208,100.5250,10],
   ['พระนครศรีอยุธยา',null,14.3532,100.5680,10],['อ่างทอง',null,14.5896,100.4550,10],
@@ -318,21 +333,26 @@ provinces.forEach(([val,label])=>{
   provSelect.appendChild(opt);
 });
 
+// เริ่มต้นแผนที่
 const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([13.2, 101.0], 6);
+
+// เลเยอร์แผนที่พร้อมระบบสำรองหาก MapTiler ล่ม
 const baseLayer = L.tileLayer('https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=heBoKGgYEE6tSt7eXYza', {
-  maxZoom: 19, attribution: '&copy; MapTiler &copy; OpenStreetMap contributors', crossOrigin: true, updateWhenIdle: true, keepBuffer: 4
+  maxZoom: 19, attribution: '&copy; MapTiler &copy; OpenStreetMap', crossOrigin: true, updateWhenIdle: true
 }).addTo(map);
-// บาง tile อาจโหลดพลาดชั่วคราว (เครือข่าย) — สั่งให้ลองโหลดซ้ำอัตโนมัติแทนที่จะปล่อยว่างค้างไว้
+
 baseLayer.on('tileerror', (e)=>{
-  setTimeout(()=>{ e.tile.src = e.tile.src; }, 800);
+  // หาก MapTiler มีปัญหา ให้ดึงจาก OpenStreetMap โดยตรงแทน
+  e.tile.src = `https://tile.openstreetmap.org/${e.coords.z}/${e.coords.x}/${e.coords.y}.png`;
 });
 
+// กรอบขอบเขตจังหวัดราชบุรี (แก้เงาคลุมให้ครอบคลุมรอบโลก ไม่ตัดกรอบสี่เหลี่ยม)
 const ratchaburiOutline = [
   [13.90,99.75],[13.85,99.95],[13.70,100.05],[13.45,100.05],[13.20,99.95],
   [13.05,99.75],[13.05,99.45],[13.20,99.15],[13.45,99.05],[13.65,99.05],
   [13.85,99.20],[13.95,99.50]
 ];
-const worldBigBox = [[5,90],[5,112],[25,112],[25,90]];
+const worldBigBox = [[-85,-180],[-85,180],[85,180],[85,-180]];
 const maskLayer = L.polygon([worldBigBox, ratchaburiOutline], { stroke:false, fillColor:'#2C3531', fillOpacity:0.45, interactive:false });
 const outlineLayer = L.polygon(ratchaburiOutline, { color:'#F3EFEA', weight:2.5, fill:false, interactive:false });
 
@@ -355,7 +375,7 @@ function renderMarker(p){
   markers[p.id] = m;
 }
 
-// ฟังก์ชันโหลดข้อมูลล่าสุดจาก Firebase
+// ฟังก์ชันโหลดข้อมูลจาก Firebase
 async function loadFromFirebase(){
   try {
     const snapshot = await db.collection('places').get();
@@ -371,12 +391,12 @@ async function loadFromFirebase(){
     });
     places.forEach(renderMarker);
   } catch(e) {
-    console.error("โหลดข้อมูลจาก Firebase ล้มเหลว: ", e);
+    console.error("โหลดข้อมูลจาก Firebase ไม่สำเร็จ: ", e);
   }
 }
 
 places.forEach(renderMarker);
-loadFromFirebase(); // ดึงข้อมูลจาก Cloud Firestore ทันที
+loadFromFirebase();
 
 const filtersEl = document.getElementById('filters');
 Object.entries(TAG_LABELS).forEach(([key,label])=>{
@@ -408,11 +428,13 @@ provSelect.addEventListener('change', (e)=>{
   if(val === 'ratchaburi'){
     if(!map.hasLayer(maskLayer)) maskLayer.addTo(map);
     if(!map.hasLayer(outlineLayer)) outlineLayer.addTo(map);
+    // เปิดข้อมูลร้านโกเด้งเส้นกะสั่งให้อัตโนมัติเมื่อเลือกราชบุรี
+    setTimeout(()=> openSheet('godeng_bansing'), 1200);
   } else {
     if(map.hasLayer(maskLayer)) map.removeLayer(maskLayer);
     if(map.hasLayer(outlineLayer)) map.removeLayer(outlineLayer);
   }
-  map.flyTo([lat,lng], zoom, { duration: 1.1 });
+  map.flyTo([lat,lng], zoom, { duration: 1.2 });
   closeSheet();
 });
 
@@ -483,7 +505,7 @@ function closeSheet(){ sheet.classList.remove('open'); currentId=null; }
 document.getElementById('sheetClose').addEventListener('click', closeSheet);
 map.on('click', closeSheet);
 
-// ฟังก์ชันยืนยันข้อมูล + เซฟลง Firebase
+// ยืนยันข้อมูล + อัปเดตลง Firebase
 async function verify(id){
   if(verifiedByMe.has(id)) return;
   const p = places.find(x=>x.id===id);
@@ -497,7 +519,7 @@ async function verify(id){
       status: p.status
     }, { merge: true });
   } catch(err) {
-    console.error("เซฟการยืนยันไม่สำเร็จ:", err);
+    console.error("บันทึกการยืนยันไม่สำเร็จ:", err);
   }
 
   renderMarker(p);
@@ -516,21 +538,21 @@ function renderEditTags(p){
   });
 }
 
-// บันทึกข้อมูลการเข้าถึง (TAGS) ลง Firebase Firestore ทันที!
+// บันทึก Tags ลง Firebase
 document.getElementById('btnSaveTags').addEventListener('click', async ()=>{
   if(!currentId) return;
   const p = places.find(x=>x.id===currentId);
   document.querySelectorAll('#editTagGrid input').forEach(cb=>{ p.tags[cb.dataset.key] = cb.checked; });
   
   try {
-    showToast('กำลังบันทึกลง Firebase...');
+    showToast('กำลังบันทึกลงฐานข้อมูล...');
     await db.collection('places').doc(currentId).set({
       tags: p.tags
     }, { merge: true });
-    showToast('บันทึกลงฐานข้อมูลสำเร็จแล้ว!');
+    showToast('บันทึกข้อมูลเรียบร้อยแล้ว!');
   } catch(err) {
     console.error("บันทึกไม่สำเร็จ:", err);
-    showToast('บันทึกไม่สำเร็จ ตรวจสอบ Rules ของ Firebase');
+    showToast('บันทึกไม่สำเร็จ');
   }
 
   renderPills(p);
@@ -552,7 +574,7 @@ function renderComments(p){
   }
 }
 
-// ส่งความคิดเห็น + เซฟลง Firebase
+// บันทึกความคิดเห็นลง Firebase
 document.getElementById('commentSend').addEventListener('click', async ()=>{
   const input = document.getElementById('commentInput');
   const text = input.value.trim();
@@ -649,6 +671,11 @@ function showToast(msg){
   t.textContent = msg; t.classList.add('show');
   setTimeout(()=> t.classList.remove('show'), 2200);
 }
+
+// สั่งคำนวณแผนที่ใหม่ทันทีที่โหลดเสร็จ ป้องกันแผนที่แหว่ง
+window.addEventListener('load', () => {
+  setTimeout(() => { map.invalidateSize(); }, 300);
+});
 </script>
 </body>
 </html>
