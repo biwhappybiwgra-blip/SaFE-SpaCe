@@ -6,11 +6,9 @@
 <title>SaFE SpaCe — แผนที่การเข้าถึงและพื้นที่ปลอดภัย</title>
 <link rel="icon" type="image/png" href="logomap.png">
 
-<!-- Leaflet CSS & JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
 
@@ -18,24 +16,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
 <style id="themeStyle">
   :root{
-    /* ธีมเริ่มต้น: Earth Sage */
     --bg-1: #FBF9F5;
     --bg-2: #F4EFE6;
     --yellow-soft: #FFF9EB;
     --yellow-border: #E8DECD;
-    
     --sage: #386641;
     --sage-dark: #2B4E32;
     --sage-light: #EBF4EC;
-
     --brown: #754C29;
     --brown-dark: #5C3A1E;
-    
     --ink: #221C18;
     --ink-subtle: #6E6359;
     --rust: #B84A39;
     --pin-unverified: #A49B8D;
-    
     --radius: 18px;
     --shadow: 0 4px 18px rgba(34, 28, 24, 0.08);
   }
@@ -173,33 +166,38 @@
   .comment-form button{ min-width:48px; min-height:44px; border-radius:10px; border:none; background:var(--sage);
     color:#fff; font-weight:700; cursor:pointer; font-size:14px; }
 
-  @media (max-width:768px){ #sheet{ left:0; right:0; bottom:0; border-radius:22px 22px 0 0; max-height:82vh; } }
+  @media (max-width:768px){ #sheet{ left:0; right:0; bottom:0; border-radius:24px 24px 0 0; max-height:82vh; } }
   @media (min-width:769px){
     #sheet{ left:18px; top:125px; width:360px; max-height:calc(100vh - 150px); border-radius:var(--radius); transform:translateX(-130%); }
     #sheet.open{ transform:translateX(0); }
   }
 
-  /* ปุ่มลอย */
   #addPlaceFab{ position:absolute; right:18px; bottom:88px; z-index:1090; width:54px; height:54px; border-radius:50%;
     border:none; background:var(--sage); box-shadow:0 4px 16px rgba(56,102,65,0.38); cursor:pointer; display:flex; align-items:center;
     justify-content:center; transition:transform .15s ease; }
   #addPlaceFab:hover{ transform:scale(1.08); background:var(--sage-dark); }
   #addPlaceFab svg{ fill:#fff; width:26px; height:26px; }
 
-  #searchFab{ position:absolute; right:18px; bottom:24px; z-index:1090; width:54px; height:54px; border-radius:50%;
+  #searchFab{ position:absolute; right:18px; bottom:24px; z-index:1095; width:54px; height:54px; border-radius:50%;
     border:none; background:var(--brown); box-shadow:0 4px 16px rgba(117,76,41,0.35); cursor:pointer; display:flex; align-items:center;
     justify-content:center; transition:transform .15s ease; }
   #searchFab:hover{ transform:scale(1.06); background:var(--brown-dark); }
   #searchFab svg{ fill:none; stroke:#fff; width:24px; height:24px; }
   
-  #searchPanel{ position:absolute; right:18px; bottom:150px; z-index:1090; width:310px; max-height:390px;
-    background:#fff; border:1px solid var(--yellow-border); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px; overflow:hidden;
-    display:flex; flex-direction:column; transform:translateY(20px) scale(0.95); opacity:0; pointer-events:none;
+  #searchPanel{ position:absolute; right:18px; bottom:90px; z-index:1150; width:330px; max-height:420px;
+    background:#fff; border:1px solid var(--yellow-border); border-radius:var(--radius); box-shadow:0 12px 36px rgba(34,28,24,0.2);
+    padding:16px; overflow:hidden; display:flex; flex-direction:column; transform:translateY(20px) scale(0.95); opacity:0; pointer-events:none;
     transition:transform .2s ease, opacity .2s ease; }
   #searchPanel.open{ transform:translateY(0) scale(1); opacity:1; pointer-events:auto; }
-  #searchPanel input{ width:100%; min-height:42px; border-radius:10px; border:1px solid var(--yellow-border);
-    padding:0 12px; font-family:'Sarabun',sans-serif; font-size:14px; margin-bottom:8px; color:var(--ink); }
-  #searchResults{ overflow-y:auto; max-height:260px; }
+  
+  .search-input-group{ display:flex; gap:6px; margin-bottom:8px; }
+  .search-input-group input{ flex:1; min-height:42px; border-radius:10px; border:1px solid var(--yellow-border);
+    padding:0 12px; font-family:'Sarabun',sans-serif; font-size:14px; color:var(--ink); outline:none; }
+  .search-input-group input:focus{ border-color:var(--brown); }
+  .btn-search-go{ background:var(--brown); color:#fff; border:none; border-radius:10px; padding:0 14px;
+    font-family:'Sarabun',sans-serif; font-size:13.5px; font-weight:700; cursor:pointer; }
+
+  #searchResults{ overflow-y:auto; max-height:240px; }
   .search-item{ padding:9px 4px; border-bottom:1px solid var(--bg-2); cursor:pointer; font-size:13.5px; font-weight:600; color:var(--ink); }
   .search-item:last-child{ border-bottom:none; }
   .search-item .si-cat{ font-size:12px; font-weight:400; color:var(--brown); }
@@ -212,7 +210,6 @@
   #pinModeBanner button{ background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:999px;
     padding:5px 12px; font-size:12px; cursor:pointer; font-family:'Sarabun',sans-serif; }
 
-  /* Modal */
   .modal-overlay{ position:fixed; inset:0; z-index:1300; background:rgba(34,28,24,0.45); backdrop-filter:blur(3px);
     display:none; align-items:center; justify-content:center; padding:16px; }
   .modal-overlay.open{ display:flex; }
@@ -260,7 +257,6 @@
 
 <div id="map"></div>
 
-<!-- ปุ่มสลับโหมดขยายตัวหนังสือแผนที่ 2x -->
 <button id="toggleMapTextBtn" title="สลับขนาดตัวหนังสือแผนที่">
   <span>🔤 ตัวหนังสือแผนที่: ปกติ</span>
 </button>
@@ -292,7 +288,6 @@
   <div class="filters" id="filters" role="group" aria-label="ตัวกรองการเข้าถึง"></div>
 </header>
 
-<!-- หน้ารายละเอียดสถานที่ -->
 <div id="sheet" role="dialog" aria-modal="false" aria-labelledby="sheetTitle">
   <button class="closeBtn" id="sheetClose" aria-label="ปิด">✕</button>
   <span class="status-badge" id="sheetStatus"></span>
@@ -347,12 +342,18 @@
 </button>
 
 <div id="searchPanel">
-  <input type="text" id="searchInput" placeholder="ค้นหาชื่อร้าน หรือตำบล/อำเภอ...">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <span style="font-weight:700;font-size:14px;color:var(--ink);">🔍 ค้นหาสถานที่</span>
+    <button id="closeSearchPanel" style="background:none;border:none;font-size:16px;cursor:pointer;color:var(--ink-subtle);">✕</button>
+  </div>
+  <div class="search-input-group">
+    <input type="text" id="searchInput" placeholder="พิมพ์ชื่อร้าน หรือตำบล/อำเภอ...">
+    <button class="btn-search-go" id="btnExecuteSearch">ค้นหา</button>
+  </div>
   <div id="searchResults"></div>
   <button class="online-search-btn" id="btnOnlineSearch">🌐 ค้นหาพิกัดพื้นที่ทั่วไทย (OpenStreetMap)</button>
 </div>
 
-<!-- Modal: เพิ่มร้านใหม่ -->
 <div class="modal-overlay" id="addPlaceModal">
   <div class="modal-card">
     <div class="modal-header">
@@ -403,7 +404,6 @@
   </div>
 </div>
 
-<!-- Modal: จัดการรูปภาพ -->
 <div class="modal-overlay" id="photoManagerModal">
   <div class="modal-card">
     <div class="modal-header">
@@ -426,7 +426,6 @@
   </div>
 </div>
 
-<!-- Modal: ร้านค้าแลกธีม -->
 <div class="modal-overlay" id="themeShopModal">
   <div class="modal-card">
     <div class="modal-header">
@@ -438,7 +437,6 @@
   </div>
 </div>
 
-<!-- Modal: แดชบอร์ดสถิติเมือง -->
 <div class="modal-overlay" id="statsModal">
   <div class="modal-card">
     <div class="modal-header">
@@ -471,7 +469,6 @@
 <div id="toast"></div>
 
 <script>
-// ---------- เริ่มต้นใช้งาน Firebase ----------
 const firebaseConfig = {
   apiKey: "AIzaSyB8YtSJcYh-8EeYkLDF9lo-XQKj884WIjM",
   authDomain: "project501-dd958.firebaseapp.com",
@@ -485,9 +482,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ----------------------------------------------------
-// 🎨 ร้านค้าแลกธีมสี
-// ----------------------------------------------------
 const THEMES = {
   default: {
     id: 'default',
@@ -651,7 +645,6 @@ window.buyTheme = function(themeId, cost) {
   }
 };
 
-// ---------- ไอคอน SVG กลางระบบ ----------
 const ICONS = {
   ramp: '<svg class="ic" viewBox="0 0 20 20"><path d="M2 17h16v1H2z"/><path d="M2 17L13 6h2L4 17z"/><circle cx="4.6" cy="15.6" r="1.4"/></svg>',
   toilet: '<svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="5" r="2.3"/><path d="M6 18l1.2-8.5A2 2 0 019.2 8h1.6a2 2 0 012 1.5L14 18h-2l-.8-6h-2.4l-.8 6z"/></svg>',
@@ -672,7 +665,6 @@ const TAG_ICON_KEY = { has_ramp:'ramp', has_gender_neutral_toilet:'toilet', has_
 document.getElementById('editTagsTitle').innerHTML = ICONS.wrench + 'ช่วยเติม/แก้ไขข้อมูลการเข้าถึง';
 document.getElementById('commentsTitle').innerHTML = ICONS.comment + 'ความคิดเห็น';
 
-// 🎯 แก้ไอคอนสัญลักษณ์ในหมุด: ใช้ SVG เวกเตอร์แท้สีขาว คมชัด 100% ทุกเครื่อง ไม่หาย ไม่กลายเป็นวงกลมเปล่าอีกต่อไป
 function categoryGlyph(category){
   switch(category){
     case 'ก๋วยเตี๋ยว':
@@ -691,12 +683,10 @@ function categoryGlyph(category){
     case 'จุดเปลี่ยว/ไฟทางดับ':
       return `<g fill="#fff"><path d="M15 9a3.5 3.5 0 00-3.5 3.5c0 1.5 1 2.5 1.5 3.5h4c.5-1 1.5-2 1.5-3.5A3.5 3.5 0 0015 9z"/><rect x="13.5" y="17" width="3" height="1.5" rx=".5"/></g>`;
     default:
-      // ค่าเริ่มต้น: แสดงไอคอนวงกลมสีขาวชัดเจน ไม่ปล่อยให้หมุดว่างเปล่า!
       return `<circle cx="15" cy="14" r="4.5" fill="#fff"/>`;
   }
 }
 
-// 🚫 บัญชีดำ (Blacklist): ตัดหมุดจำลองเดิมทั้งหมดทิ้ง ไม่ให้ขึ้นแผนที่
 const MOCK_IDS = new Set(['r1','r2','r3','r4','r5','r6','r7','r8','r9','r10','r11','r12','r13']);
 const MOCK_TITLES = new Set([
   'ครัวคุณต๋อย 1935', 'ตลาดสนามหญ้า', 'เนื้อต้มบ้านสิงห์ เจ๊ติ๋ม',
@@ -725,8 +715,6 @@ provinces.forEach(([val,label])=>{
   provSelect.appendChild(opt);
 });
 
-// 🗺️ แผนที่ Google Maps แบบคลีนตา (สั่งซ่อนหมุดธุรกิจ/ร้านค้าอื่นทั้งหมดด้วย apistyle=s.t:33|p.v:off)
-// จะแสดงเฉพาะ ถนน, ซอย, แม่น้ำ, ชื่อตำบล, และชื่ออำเภอ ไม่รกตาอีกต่อไป!
 const map = L.map('map', { zoomControl:true, attributionControl:false }).setView([13.2, 101.0], 6);
 
 let googleNormalLayer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&hl=th&gl=TH&apistyle=s.t:33|p.v:off&x={x}&y={y}&z={z}', {
@@ -830,7 +818,7 @@ function updateNavLinks(p) {
   navBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
 
   const searchBtn = document.getElementById('btnNavSearch');
-  searchBtn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.title + ' บ้านสิงห์ ราชบุรี')}`;
+  searchBtn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((p.title || '') + ' บ้านสิงห์ ราชบุรี')}`;
 }
 
 function compressImageFile(file) {
@@ -859,7 +847,6 @@ function compressImageFile(file) {
   });
 }
 
-// 🎯 โหลดเฉพาะหมุดของคุณจาก Firebase (ข้ามหมุดจำลองเดิมทั้งหมด)
 async function loadFromFirebase(){
   try {
     const snapshot = await db.collection('places').get();
@@ -928,7 +915,7 @@ provSelect.addEventListener('change', (e)=>{
   if(val === 'ratchaburi'){
     if(!map.hasLayer(maskLayer)) maskLayer.addTo(map);
     if(!map.hasLayer(outlineLayer)) outlineLayer.addTo(map);
-    const bsPlace = places.find(x=>x.id==='godeng_bansing' || x.title.includes('โกเด้ง'));
+    const bsPlace = places.find(x=>x.id==='godeng_bansing' || (x.title && x.title.includes('โกเด้ง')));
     if(bsPlace) setTimeout(()=> openSheet(bsPlace.id), 1200);
   } else {
     if(map.hasLayer(maskLayer)) map.removeLayer(maskLayer);
@@ -981,7 +968,7 @@ function renderSheetGallery(p) {
     const img = document.createElement('img');
     img.src = src;
     img.className = `gallery-img ${isSingle ? 'single' : ''}`;
-    img.alt = p.title;
+    img.alt = p.title || '';
     img.addEventListener('click', () => {
       const w = window.open("");
       w.document.write(`<img src="${src}" style="max-width:100%;height:auto;margin:auto;display:block;">`);
@@ -994,7 +981,7 @@ function openSheet(id){
   const p = places.find(x=>x.id===id);
   if(!p) return;
   currentId = id;
-  document.getElementById('sheetTitle').textContent = p.title;
+  document.getElementById('sheetTitle').textContent = p.title || 'ไม่มีชื่อร้าน';
   document.getElementById('sheetCat').textContent = p.category || 'ทั่วไป';
   document.getElementById('sheetDesc').textContent = p.desc || 'ไม่มีคำอธิบาย';
   
@@ -1031,7 +1018,6 @@ function renderPills(p){
 function closeSheet(){ sheet.classList.remove('open'); currentId=null; }
 document.getElementById('sheetClose').addEventListener('click', closeSheet);
 
-// 🗑️ ปุ่มลบหมุดนี้ออกจากระบบถาวร
 document.getElementById('btnDeletePlace').addEventListener('click', async () => {
   if (!currentId) return;
   const p = places.find(x => x.id === currentId);
@@ -1054,9 +1040,6 @@ document.getElementById('btnDeletePlace').addEventListener('click', async () => 
   }
 });
 
-// ----------------------------------------------------
-// 🌟 จัดการรูปถ่ายสถานที่
-// ----------------------------------------------------
 const photoManagerModal = document.getElementById('photoManagerModal');
 const btnOpenPhotoManager = document.getElementById('btnOpenPhotoManager');
 const photoManagerClose = document.getElementById('photoManagerClose');
@@ -1144,9 +1127,6 @@ btnSaveManagedPhotos.addEventListener('click', async () => {
 photoManagerClose.addEventListener('click', () => photoManagerModal.classList.remove('open'));
 btnCancelPhotoManager.addEventListener('click', () => photoManagerModal.classList.remove('open'));
 
-// ----------------------------------------------------
-// 🌟 ปักหมุดร้านใหม่
-// ----------------------------------------------------
 let isPinningMode = false;
 let tempPinCoords = null;
 let newPlaceSelectedPhotos = [];
@@ -1291,9 +1271,6 @@ document.getElementById('btnSubmitNewPlace').addEventListener('click', async () 
   }
 });
 
-// ----------------------------------------------------
-// 🌟 แชร์ & รายงาน & สถิติ & ค้นหา
-// ----------------------------------------------------
 document.getElementById('btnShare').addEventListener('click', async () => {
   if(!currentId) return;
   const p = places.find(x=>x.id===currentId);
@@ -1357,9 +1334,82 @@ statsBtn.addEventListener('click', () => {
 });
 statsModalClose.addEventListener('click', () => statsModal.classList.remove('open'));
 
-document.getElementById('btnOnlineSearch').addEventListener('click', async () => {
+const searchFab = document.getElementById('searchFab');
+const searchPanel = document.getElementById('searchPanel');
+const searchInput = document.getElementById('searchInput');
+const closeSearchPanel = document.getElementById('closeSearchPanel');
+const btnExecuteSearch = document.getElementById('btnExecuteSearch');
+const btnOnlineSearch = document.getElementById('btnOnlineSearch');
+
+searchFab.addEventListener('click', () => {
+  searchPanel.classList.toggle('open');
+  if (searchPanel.classList.contains('open')) {
+    searchInput.focus();
+    renderSearchResults(searchInput.value);
+  }
+});
+
+closeSearchPanel.addEventListener('click', () => {
+  searchPanel.classList.remove('open');
+});
+
+function renderSearchResults(q) {
+  const results = document.getElementById('searchResults');
+  const query = (q || '').trim().toLowerCase();
+  
+  const matches = query 
+    ? places.filter(p => (p.title || '').toLowerCase().includes(query) || (p.desc || '').toLowerCase().includes(query))
+    : places;
+
+  results.innerHTML = '';
+  if (!matches.length) {
+    results.innerHTML = '<div style="font-size:13px;color:var(--ink-subtle);padding:10px 4px;">ไม่พบร้านในระบบ (ลองกดค้นหาพิกัดทั่วไทยด้านล่าง)</div>';
+    return;
+  }
+
+  matches.slice(0, 20).forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'search-item';
+    item.innerHTML = `📍 <strong>${escapeHtml(p.title || 'ไม่มีชื่อ')}</strong><div class="si-cat">${escapeHtml(p.category || 'ทั่วไป')}</div>`;
+    item.addEventListener('click', () => {
+      map.flyTo([p.lat, p.lng], 16, { duration: 1.2 });
+      openSheet(p.id);
+      searchPanel.classList.remove('open');
+    });
+    results.appendChild(item);
+  });
+}
+
+function handleSearchAction() {
   const query = searchInput.value.trim();
-  if(!query) {
+  if (!query) return;
+
+  const localMatch = places.find(p => (p.title || '').toLowerCase().includes(query.toLowerCase()));
+  if (localMatch) {
+    map.flyTo([localMatch.lat, localMatch.lng], 16, { duration: 1.2 });
+    openSheet(localMatch.id);
+    searchPanel.classList.remove('open');
+    showToast(`พบร้าน: ${localMatch.title}`);
+  } else {
+    performOnlineSearch(query);
+  }
+}
+
+btnExecuteSearch.addEventListener('click', handleSearchAction);
+
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleSearchAction();
+  }
+});
+
+searchInput.addEventListener('input', () => {
+  renderSearchResults(searchInput.value);
+});
+
+async function performOnlineSearch(query) {
+  if (!query) {
     alert('กรุณาพิมพ์ชื่อสถานที่ หรือตำบล/อำเภอที่ต้องการค้นหา');
     return;
   }
@@ -1370,28 +1420,30 @@ document.getElementById('btnOnlineSearch').addEventListener('click', async () =>
     const resultsContainer = document.getElementById('searchResults');
     resultsContainer.innerHTML = '';
 
-    if(!data.length) {
-      resultsContainer.innerHTML = '<div style="font-size:12px;color:var(--ink-subtle);padding:6px;">ไม่พบพิกัดที่ค้นหา ลองระบุชื่ออำเภอเพิ่ม</div>';
+    if (!data || !data.length) {
+      resultsContainer.innerHTML = '<div style="font-size:13px;color:var(--ink-subtle);padding:8px 4px;">ไม่พบพิกัดที่ค้นหา ลองระบุชื่ออำเภอหรือจังหวัดเพิ่ม</div>';
       return;
     }
 
     data.slice(0, 8).forEach(item => {
       const div = document.createElement('div');
       div.className = 'search-item';
-      div.innerHTML = `📍 <strong>${escapeHtml(item.display_name.split(',')[0])}</strong><div class="si-cat">${escapeHtml(item.display_name)}</div>`;
+      div.innerHTML = `🌐 <strong>${escapeHtml(item.display_name.split(',')[0])}</strong><div class="si-cat">${escapeHtml(item.display_name)}</div>`;
       div.addEventListener('click', () => {
-        map.flyTo([parseFloat(item.lat), parseFloat(item.lon)], 14, { duration: 1.2 });
+        map.flyTo([parseFloat(item.lat), parseFloat(item.lon)], 15, { duration: 1.2 });
         searchPanel.classList.remove('open');
         showToast(`บินไปยัง: ${item.display_name.split(',')[0]}`);
       });
       resultsContainer.appendChild(div);
     });
-  } catch(err) {
+  } catch (err) {
     showToast('ค้นหาพิกัดออนไลน์ไม่สำเร็จ');
   }
-});
+}
 
-// ----------------------------------------------------
+btnOnlineSearch.addEventListener('click', () => {
+  performOnlineSearch(searchInput.value.trim());
+});
 
 async function verify(id){
   if(verifiedByMe.has(id)) return;
@@ -1403,7 +1455,7 @@ async function verify(id){
   try {
     await db.collection('places').doc(id).set({ votes: p.votes, status: p.status }, { merge: true });
     addPoints(5, 'ช่วยยืนยันข้อมูล');
-  } catch(err) { console.error("บันทึกการยืนยันไม่สำเร็จ:", err); }
+  } catch(err) { console.error(err); }
 
   renderMarker(p);
   openSheet(id);
@@ -1472,7 +1524,7 @@ document.getElementById('commentSend').addEventListener('click', async ()=>{
   renderComments(p);
 });
 
-function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
 
 let userMarker = null;
 const nearbyPanel = document.getElementById('nearbyPanel');
@@ -1514,34 +1566,6 @@ function showNearby(lat,lng){
   nearbyPanel.classList.add('open');
 }
 document.getElementById('nearbyClose').addEventListener('click', ()=> nearbyPanel.classList.remove('open'));
-
-const searchFab = document.getElementById('searchFab');
-const searchPanel = document.getElementById('searchPanel');
-const searchInput = document.getElementById('searchInput');
-searchFab.addEventListener('click', ()=>{
-  searchPanel.classList.toggle('open');
-  if(searchPanel.classList.contains('open')){ searchInput.focus(); renderSearchResults(''); }
-});
-
-function renderSearchResults(q){
-  const results = document.getElementById('searchResults');
-  const query = q.trim().toLowerCase();
-  const matches = query ? places.filter(p=>p.title.toLowerCase().includes(query)) : places;
-  results.innerHTML = '';
-  if(!matches.length){ results.innerHTML = '<div class="search-empty">ไม่พบร้านในระบบ (ลองกดค้นหาพิกัดทั่วไทยด้านล่าง)</div>'; return; }
-  matches.slice(0,20).forEach(p=>{
-    const item = document.createElement('div');
-    item.className = 'search-item';
-    item.innerHTML = `${escapeHtml(p.title)}<div class="si-cat">${escapeHtml(p.category||'')}</div>`;
-    item.addEventListener('click', ()=>{
-      map.flyTo([p.lat,p.lng], 15, {duration:1});
-      openSheet(p.id);
-      searchPanel.classList.remove('open');
-    });
-    results.appendChild(item);
-  });
-}
-searchInput.addEventListener('input', ()=> renderSearchResults(searchInput.value));
 
 function showToast(msg){
   const t = document.getElementById('toast');
