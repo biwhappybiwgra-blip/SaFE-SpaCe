@@ -426,4 +426,514 @@ let places = [
   { id:'r1', title:'ครัวคุณต๋อย 1935', lat:13.5363, lng:99.8175, category:'อาหารไทย', desc:'ร้านอาหารไทยชื่อดังติดสถานีรถไฟ อ.เมืองราชบุรี บรรยากาศย้อนยุค', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:true }, status:'verified', votes:8, comments:[] },
   { id:'r2', title:'ตลาดสนามหญ้า', lat:13.5312, lng:99.8121, category:'ตลาด/สตรีทฟู้ด', desc:'แหล่งรวมร้านอาหารอร่อยที่มีชื่อเสียงของ อ.เมืองราชบุรี เปิดตั้งแต่สายจนถึงค่ำ', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
   { id:'r3', title:'เนื้อต้มบ้านสิงห์ เจ๊ติ๋ม', lat:13.5520, lng:99.7800, category:'อาหารไทย', desc:'ร้านเนื้อตุ๋น/เนื้อต้มชื่อดังย่านเขางู ราชบุรี', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r4', title:'ถนนคนเดินริมแม่น้ำแม่กลอง', lat:13.5378, lng:99.8163, category:'ตลาด/สตรีทฟู้ด', desc:'ถนนคนเดินริมแม่น้ำแม่ก
+  { id:'r4', title:'ถนนคนเดินริมแม่น้ำแม่กลอง', lat:13.5378, lng:99.8163, category:'ตลาด/สตรีทฟู้ด', desc:'ถนนคนเดินริมแม่น้ำแม่กลอง แหล่งรวมของกินยามค่ำ', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
+  { id:'r5', title:'ครัวตะนาวศรี Cafe & Eatery', lat:13.5722, lng:99.3128, category:'คาเฟ่', desc:'ร้านอาหาร-คาเฟ่บรรยากาศเรือนกระจกใน อ.สวนผึ้ง', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
+  { id:'r6', title:'คาเฟ่จุดแวะพักสวนผึ้ง (โมอาย)', lat:13.5600, lng:99.3200, category:'คาเฟ่', desc:'จุดแวะพักยอดนิยมของสวนผึ้ง เด่นด้วยรูปปั้นโมอาย', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
+  { id:'r7', title:'ครัวม่อนไข่', lat:13.6772, lng:99.8578, category:'อาหารไทย', desc:'ร้านดังของโพธาราม กว่า 20 ปี บรรยากาศอบอุ่น', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
+  { id:'r8', title:'ก๋วยเตี๋ยวเนื้อน้ำแดงวัดช่องลม', lat:13.5320, lng:99.8030, category:'ก๋วยเตี๋ยว', desc:'ก๋วยเตี๋ยวเนื้อหน้าวัดช่องลม อ.เมืองราชบุรี', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
+  { id:'r11', title:'เด่นไทยไอศกรีม', lat:13.5312, lng:99.8121, category:'ของหวาน/ไอศกรีม', desc:'ร้านไอศกรีมชื่อดัง ตลาดสนามหญ้า อ.เมืองราชบุรี', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
+  { id:'r13', title:'โรงพยาบาลราชบุรี', lat:13.5375, lng:99.8155, category:'โรงพยาบาล', desc:'โรงพยาบาลศูนย์ประจำจังหวัด ถ.สมบูรณ์กุล ต.หน้าเมือง', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:true, wide_door:true, has_night_lighting:true }, status:'verified', votes:20, comments:[] }
+];
+
+const provinces = [
+  ['thailand','🇹🇭 ประเทศไทย (ภาพรวม)', 13.2, 101.0, 6],
+  ['ratchaburi','📍 จ.ราชบุรี (บ้านสิงห์)', 13.6732, 99.8756, 16],
+  ['กรุงเทพมหานคร',null,13.7563,100.5018,10],['สมุทรปราการ',null,13.5991,100.5998,10],
+  ['นนทบุรี',null,13.8621,100.5144,10],['ปทุมธานี',null,14.0208,100.5250,10],
+  ['พระนครศรีอยุธยา',null,14.3532,100.5680,10],['อ่างทอง',null,14.5896,100.4550,10],
+  ['ลพบุรี',null,14.7995,100.6534,9],['สิงห์บุรี',null,14.8907,100.3968,10],
+  ['ชัยนาท',null,15.1851,100.1251,10],['สระบุรี',null,14.5289,100.9101,10],
+  ['ชลบุรี',null,13.3611,100.9847,9],['ระยอง',null,12.6814,101.2816,9],
+  ['จันทบุรี',null,12.6103,102.1038,9],['ตราด',null,12.2428,102.5178,9],
+  ['ฉะเชิงเทรา',null,13.6904,101.0779,9],['ปราจีนบุรี',null,14.0509,101.3720,9],
+  ['นครนายก',null,14.2069,101.2130,10],['สระแก้ว',null,13.8244,102.0645,9],
+  ['กาญจนบุรี',null,14.0227,99.5328,8],['สุพรรณบุรี',null,14.4744,100.1177,9],
+  ['นครปฐม',null,13.8199,100.0620,10],['สมุทรสาคร',null,13.5475,100.2740,10],
+  ['สมุทรสงคราม',null,13.4098,100.0022,10],['เพชรบุรี',null,13.1119,99.9398,9],
+  ['ประจวบคีรีขันธ์',null,11.8125,99.7957,8],['นครราชสีมา',null,14.9799,102.0977,8]
+];
+
+const provSelect = document.getElementById('provinceSelect');
+provinces.forEach(([val,label])=>{
+  const opt = document.createElement('option');
+  opt.value = val; opt.textContent = label || val;
+  provSelect.appendChild(opt);
+});
+
+// เริ่มต้นแผนที่ MapTiler
+const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([13.2, 101.0], 6);
+
+const baseLayer = L.tileLayer('https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=heBoKGgYEE6tSt7eXYza', {
+  maxZoom: 19, attribution: '&copy; MapTiler &copy; OpenStreetMap contributors', crossOrigin: true, updateWhenIdle: true, keepBuffer: 4
+}).addTo(map);
+
+baseLayer.on('tileerror', (e)=>{
+  setTimeout(()=>{ e.tile.src = e.tile.src; }, 800);
+});
+
+const ratchaburiOutline = [
+  [13.90,99.75],[13.85,99.95],[13.70,100.05],[13.45,100.05],[13.20,99.95],
+  [13.05,99.75],[13.05,99.45],[13.20,99.15],[13.45,99.05],[13.65,99.05],
+  [13.85,99.20],[13.95,99.50]
+];
+const worldBigBox = [[-85,-180],[-85,180],[85,180],[85,-180]];
+const maskLayer = L.polygon([worldBigBox, ratchaburiOutline], { stroke:false, fillColor:'#221C18', fillOpacity:0.32, interactive:false });
+const outlineLayer = L.polygon(ratchaburiOutline, { color:'#E8DECD', weight:2.5, fill:false, interactive:false });
+
+const markers = {};
+function pinIcon(status, category){
+  const fill = status==='verified' ? '#386641' : status==='disputed' ? '#B84A39' : '#A49B8D';
+  const glyph = categoryGlyph(category);
+  const svg = `<svg width="30" height="38" viewBox="0 0 30 38" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="15" cy="15" r="13" fill="${fill}" stroke="#fff" stroke-width="2.5"/>
+    <path d="M15 37 L9 21 L21 21 Z" fill="${fill}"/>
+    ${glyph}
+  </svg>`;
+  return L.divIcon({ 
+    html:`<div class="pin-wrap">${svg}</div>`, 
+    className:'custom-pin-icon', 
+    iconSize:[30,38], 
+    iconAnchor:[15,37] 
+  });
+}
+
+// วาดหมุด + เปิดให้ลากหมุดปรับพิกัดได้เอง
+function renderMarker(p){
+  if(markers[p.id]) map.removeLayer(markers[p.id]);
+  
+  const m = L.marker([p.lat, p.lng], { 
+    icon: pinIcon(p.status, p.category),
+    draggable: true
+  }).addTo(map);
+
+  m.on('click', ()=> openSheet(p.id));
+
+  m.on('dragend', async (e) => {
+    const newPos = e.target.getLatLng();
+    p.lat = Number(newPos.lat.toFixed(6));
+    p.lng = Number(newPos.lng.toFixed(6));
+    showToast(`📍 ปรับพิกัดใหม่เป็น: ${p.lat}, ${p.lng}`);
+    updateNavLinks(p);
+    try {
+      await db.collection('places').doc(p.id).set({ lat: p.lat, lng: p.lng }, { merge: true });
+    } catch(err) {}
+  });
+
+  markers[p.id] = m;
+}
+
+function updateNavLinks(p) {
+  const navBtn = document.getElementById('btnNav');
+  navBtn.innerHTML = ICONS.nav + ' นำทาง GPS';
+  navBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
+
+  const searchBtn = document.getElementById('btnNavSearch');
+  searchBtn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.title + ' บ้านสิงห์ ราชบุรี')}`;
+}
+
+// โหลดข้อมูลจาก Firebase (รองรับร้านใหม่ที่คนอื่นเพิ่มเข้ามาด้วย)
+async function loadFromFirebase(){
+  try {
+    const snapshot = await db.collection('places').get();
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      let p = places.find(x => x.id === doc.id);
+      if(p) {
+        if(data.lat && data.lng) { p.lat = data.lat; p.lng = data.lng; }
+        if(data.tags) p.tags = { ...p.tags, ...data.tags };
+        if(data.votes !== undefined) p.votes = data.votes;
+        if(data.status) p.status = data.status;
+        if(data.comments) p.comments = data.comments;
+      } else {
+        // เพิ่มร้านใหม่ที่สร้างลงในอาร์เรย์ places ทันที
+        p = { id: doc.id, ...data };
+        places.push(p);
+      }
+    });
+    places.forEach(renderMarker);
+    refreshCategoryOptions();
+  } catch(e) {
+    console.warn("ใช้ข้อมูลเริ่มต้นในเครื่อง:", e);
+  }
+}
+
+places.forEach(renderMarker);
+loadFromFirebase();
+
+const filtersEl = document.getElementById('filters');
+Object.entries(TAG_LABELS).forEach(([key,label])=>{
+  const chip = document.createElement('button');
+  chip.className = 'chip'; chip.dataset.key = key;
+  chip.innerHTML = ICONS[TAG_ICON_KEY[key]] + `<span>${label}</span>`;
+  filtersEl.appendChild(chip);
+});
+
+const catSelect = document.getElementById('categorySelect');
+function refreshCategoryOptions(){
+  const cats = [...new Set(places.map(p=>p.category).filter(Boolean))];
+  const current = catSelect.value;
+  catSelect.innerHTML = '<option value="">ทุกประเภท</option>';
+  cats.forEach(c=>{
+    const opt = document.createElement('option'); opt.value = c; opt.textContent = c;
+    catSelect.appendChild(opt);
+  });
+  if(cats.includes(current)) catSelect.value = current;
+}
+refreshCategoryOptions();
+catSelect.addEventListener('change', applyFilters);
+
+provSelect.addEventListener('change', (e)=>{
+  const val = e.target.value;
+  const entry = provinces.find(p=>p[0]===val);
+  if(!entry) return;
+  const [,,lat,lng,zoom] = entry;
+  if(val === 'ratchaburi'){
+    if(!map.hasLayer(maskLayer)) maskLayer.addTo(map);
+    if(!map.hasLayer(outlineLayer)) outlineLayer.addTo(map);
+    setTimeout(()=> openSheet('godeng_bansing'), 1200);
+  } else {
+    if(map.hasLayer(maskLayer)) map.removeLayer(maskLayer);
+    if(map.hasLayer(outlineLayer)) map.removeLayer(outlineLayer);
+  }
+  map.flyTo([lat,lng], zoom, { duration: 1.1 });
+  closeSheet();
+});
+
+const activeFilters = new Set();
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    const key = chip.dataset.key;
+    chip.classList.toggle('active');
+    activeFilters.has(key) ? activeFilters.delete(key) : activeFilters.add(key);
+    applyFilters();
+  });
+});
+
+function applyFilters(){
+  const catFilter = catSelect.value;
+  places.forEach(p=>{
+    const passesTags = [...activeFilters].every(k => p.tags[k] === true);
+    const passesCat = !catFilter || p.category === catFilter;
+    const m = markers[p.id];
+    if(passesTags && passesCat){ if(!map.hasLayer(m)) m.addTo(map); }
+    else { if(map.hasLayer(m)) map.removeLayer(m); if(currentId===p.id) closeSheet(); }
+  });
+}
+
+const verifiedByMe = new Set();
+let currentId = null;
+const sheet = document.getElementById('sheet');
+
+function openSheet(id){
+  const p = places.find(x=>x.id===id);
+  if(!p) return;
+  currentId = id;
+  document.getElementById('sheetTitle').textContent = p.title;
+  document.getElementById('sheetCat').textContent = p.category || '';
+  document.getElementById('sheetDesc').textContent = p.desc;
+  const photoEl = document.getElementById('sheetPhoto');
+  if(p.photo){ photoEl.src = p.photo; photoEl.style.display='block'; } else { photoEl.style.display='none'; }
+  const statusEl = document.getElementById('sheetStatus');
+  statusEl.className = 'status-badge ' + p.status;
+  statusEl.textContent = p.status==='verified' ? '✓ ชุมชนยืนยันแล้ว' : p.status==='disputed' ? '⚠ มีการแจ้งข้อมูลคลาดเคลื่อน' : '• รอการยืนยัน';
+  document.getElementById('sheetVotes').textContent = `ยืนยันแล้ว ${p.votes} คน`;
+  renderPills(p);
+  
+  updateNavLinks(p);
+
+  const verifyBtn = document.getElementById('btnVerify');
+  if(verifiedByMe.has(id)){
+    verifyBtn.disabled = true; verifyBtn.innerHTML = ICONS.verify + 'คุณยืนยันแล้ว';
+  } else {
+    verifyBtn.disabled = false; verifyBtn.innerHTML = ICONS.verify + 'ยืนยันข้อมูล';
+    verifyBtn.onclick = ()=> verify(p.id);
+  }
+  renderEditTags(p);
+  renderComments(p);
+  sheet.classList.add('open');
+}
+
+function renderPills(p){
+  const pillRow = document.getElementById('sheetPills');
+  pillRow.innerHTML = '';
+  const active = Object.entries(TAG_LABELS).filter(([k])=>p.tags[k]);
+  if(!active.length){ pillRow.innerHTML = '<span class="pill-empty">ยังไม่มีข้อมูลการเข้าถึง — ช่วยเติมข้อมูลด้านล่างได้เลย</span>'; return; }
+  active.forEach(([k,label])=>{ const s=document.createElement('span'); s.className='pill'; s.innerHTML = ICONS[TAG_ICON_KEY[k]] + `<span>${label}</span>`; pillRow.appendChild(s); });
+}
+
+function closeSheet(){ sheet.classList.remove('open'); currentId=null; }
+document.getElementById('sheetClose').addEventListener('click', closeSheet);
+
+// ----------------------------------------------------
+// 🌟 ฟังก์ชันใหม่: โหมดแตะบนแผนที่เพื่อปักหมุดร้านใหม่
+// ----------------------------------------------------
+let isPinningMode = false;
+let tempPinCoords = null;
+
+const addPlaceFab = document.getElementById('addPlaceFab');
+const pinModeBanner = document.getElementById('pinModeBanner');
+const cancelPinMode = document.getElementById('cancelPinMode');
+const addPlaceModal = document.getElementById('addPlaceModal');
+
+// เริ่มโหมดปักหมุด
+addPlaceFab.addEventListener('click', () => {
+  isPinningMode = true;
+  closeSheet();
+  pinModeBanner.style.display = 'flex';
+  showToast('📍 แตะบนแผนที่ตรงจุดที่ร้านตั้งอยู่');
+});
+
+// ยกเลิกโหมดปักหมุด
+cancelPinMode.addEventListener('click', () => {
+  isPinningMode = false;
+  pinModeBanner.style.display = 'none';
+});
+
+// เมื่อคลิกบนแผนที่
+map.on('click', (e) => {
+  if (isPinningMode) {
+    tempPinCoords = e.latlng;
+    isPinningMode = false;
+    pinModeBanner.style.display = 'none';
+    openAddPlaceModal(tempPinCoords.lat, tempPinCoords.lng);
+  } else {
+    closeSheet();
+  }
+});
+
+// เปิดหน้าต่างกรอกข้อมูลร้านใหม่
+function openAddPlaceModal(lat, lng) {
+  document.getElementById('modalCoordsText').textContent = `พิกัด: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  document.getElementById('newPlaceTitle').value = '';
+  document.getElementById('newPlaceDesc').value = '';
+
+  // เรนเดอร์แท็กสำหรับฟอร์มใหม่
+  const grid = document.getElementById('newPlaceTagsGrid');
+  grid.innerHTML = '';
+  Object.entries(TAG_LABELS).forEach(([key, label]) => {
+    const lab = document.createElement('label');
+    lab.className = 'tag-check';
+    lab.innerHTML = `<input type="checkbox" data-key="${key}">` + ICONS[TAG_ICON_KEY[key]] + `<span>${label}</span>`;
+    grid.appendChild(lab);
+  });
+
+  addPlaceModal.classList.add('open');
+  document.getElementById('newPlaceTitle').focus();
+}
+
+function closeAddPlaceModal() {
+  addPlaceModal.classList.remove('open');
+  tempPinCoords = null;
+}
+
+document.getElementById('modalClose').addEventListener('click', closeAddPlaceModal);
+document.getElementById('btnCancelModal').addEventListener('click', closeAddPlaceModal);
+
+// บันทึกร้านใหม่ลง Firebase Firestore
+document.getElementById('btnSubmitNewPlace').addEventListener('click', async () => {
+  const title = document.getElementById('newPlaceTitle').value.trim();
+  if (!title) {
+    alert('กรุณากรอกชื่อร้าน/สถานที่');
+    return;
+  }
+
+  const category = document.getElementById('newPlaceCategory').value;
+  const desc = document.getElementById('newPlaceDesc').value.trim() || 'ยังไม่มีคำอธิบาย';
+  
+  const tags = {};
+  document.querySelectorAll('#newPlaceTagsGrid input').forEach(cb => {
+    tags[cb.dataset.key] = cb.checked;
+  });
+
+  const newDocRef = db.collection('places').doc();
+  const newPlace = {
+    id: newDocRef.id,
+    title,
+    category,
+    desc,
+    lat: Number(tempPinCoords.lat.toFixed(6)),
+    lng: Number(tempPinCoords.lng.toFixed(6)),
+    tags,
+    status: 'unverified',
+    votes: 1,
+    comments: []
+  };
+
+  showToast('กำลังบันทึกร้านใหม่...');
+  closeAddPlaceModal();
+
+  try {
+    await newDocRef.set(newPlace);
+    places.push(newPlace);
+    renderMarker(newPlace);
+    refreshCategoryOptions();
+    map.flyTo([newPlace.lat, newPlace.lng], 16, { duration: 1 });
+    openSheet(newPlace.id);
+    showToast('🎉 ปักหมุดร้านใหม่เรียบร้อยแล้ว!');
+  } catch (err) {
+    console.error('บันทึกร้านใหม่ล้มเหลว:', err);
+    showToast('บันทึกไม่สำเร็จ ตรวจสอบสิทธิ์ Firebase');
+  }
+});
+
+// ----------------------------------------------------
+
+async function verify(id){
+  if(verifiedByMe.has(id)) return;
+  const p = places.find(x=>x.id===id);
+  p.votes += 1;
+  verifiedByMe.add(id);
+  if(p.status==='unverified') p.status='verified';
+  
+  try {
+    await db.collection('places').doc(id).set({ votes: p.votes, status: p.status }, { merge: true });
+  } catch(err) { console.error("บันทึกการยืนยันไม่สำเร็จ:", err); }
+
+  renderMarker(p);
+  openSheet(id);
+  showToast('ขอบคุณสำหรับการยืนยันข้อมูล!');
+}
+
+function renderEditTags(p){
+  const grid = document.getElementById('editTagGrid');
+  grid.innerHTML = '';
+  Object.entries(TAG_LABELS).forEach(([key,label])=>{
+    const lab = document.createElement('label');
+    lab.className = 'tag-check';
+    lab.innerHTML = `<input type="checkbox" data-key="${key}" ${p.tags[key]?'checked':''}>` + ICONS[TAG_ICON_KEY[key]] + `<span>${label}</span>`;
+    grid.appendChild(lab);
+  });
+}
+
+document.getElementById('btnSaveTags').addEventListener('click', async ()=>{
+  if(!currentId) return;
+  const p = places.find(x=>x.id===currentId);
+  document.querySelectorAll('#editTagGrid input').forEach(cb=>{ p.tags[cb.dataset.key] = cb.checked; });
+  
+  try {
+    showToast('กำลังบันทึกลง Firebase...');
+    await db.collection('places').doc(currentId).set({ tags: p.tags }, { merge: true });
+    showToast('บันทึกข้อมูลเรียบร้อยแล้ว!');
+  } catch(err) {
+    showToast('บันทึกไม่สำเร็จ');
+  }
+
+  renderPills(p);
+  applyFilters();
+});
+
+function renderComments(p){
+  const list = document.getElementById('commentList');
+  list.innerHTML = '';
+  if(!p.comments || !p.comments.length){
+    list.innerHTML = '<div class="no-comments">ยังไม่มีความคิดเห็น เป็นคนแรกที่แสดงความเห็น</div>';
+  } else {
+    p.comments.forEach(c=>{
+      const div = document.createElement('div');
+      div.className = 'comment-item';
+      div.innerHTML = `<div class="cname">${escapeHtml(c.name)}</div><div class="ctext">${escapeHtml(c.text)}</div>`;
+      list.appendChild(div);
+    });
+  }
+}
+
+document.getElementById('commentSend').addEventListener('click', async ()=>{
+  const input = document.getElementById('commentInput');
+  const text = input.value.trim();
+  if(!text || !currentId) return;
+  const p = places.find(x=>x.id===currentId);
+  if(!p.comments) p.comments = [];
+  p.comments.push({ name:'ผู้ใช้งาน', text });
+
+  try {
+    await db.collection('places').doc(currentId).set({ comments: p.comments }, { merge: true });
+  } catch(err) {}
+
+  input.value = '';
+  renderComments(p);
+});
+
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+let userMarker = null;
+const nearbyPanel = document.getElementById('nearbyPanel');
+document.getElementById('locateBtn').addEventListener('click', ()=>{
+  if(!navigator.geolocation){ showToast('เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง'); return; }
+  showToast('กำลังขอตำแหน่งของคุณ...');
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const { latitude, longitude } = pos.coords;
+    if(userMarker) map.removeLayer(userMarker);
+    userMarker = L.marker([latitude,longitude], { icon: L.divIcon({ html:'<div class="user-dot"></div>', className:'', iconSize:[16,16], iconAnchor:[8,8] }) }).addTo(map);
+    map.flyTo([latitude,longitude], 13, { duration: 1 });
+    showNearby(latitude, longitude);
+  }, ()=>{
+    showToast('ไม่สามารถเข้าถึงตำแหน่งได้ กรุณาอนุญาตการเข้าถึงตำแหน่ง');
+  }, { enableHighAccuracy:true, timeout:10000 });
+});
+
+function haversineKm(lat1,lng1,lat2,lng2){
+  const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function showNearby(lat,lng){
+  const withDist = places.map(p=>({ p, d: haversineKm(lat,lng,p.lat,p.lng) }))
+    .filter(x=>x.d <= 100).sort((a,b)=>a.d-b.d).slice(0,10);
+  document.getElementById('nearbySub').textContent = withDist.length
+    ? `พบร้านที่ปักหมุดไว้ใกล้คุณ ${withDist.length} แห่ง` : 'ยังไม่มีร้านที่ปักหมุดในระยะใกล้ตำแหน่งคุณ';
+  const list = document.getElementById('nearbyList');
+  list.innerHTML = '';
+  withDist.forEach(({p,d})=>{
+    const item = document.createElement('div');
+    item.className = 'nearby-item';
+    item.innerHTML = `<div><div class="ni-name">${escapeHtml(p.title)}</div><div class="ni-cat">${escapeHtml(p.category||'')}</div></div>
+      <div class="ni-dist">${d < 1 ? Math.round(d*1000)+' ม.' : d.toFixed(1)+' กม.'}</div>`;
+    item.addEventListener('click', ()=>{ map.flyTo([p.lat,p.lng], 15, {duration:1}); openSheet(p.id); });
+    list.appendChild(item);
+  });
+  nearbyPanel.classList.add('open');
+}
+document.getElementById('nearbyClose').addEventListener('click', ()=> nearbyPanel.classList.remove('open'));
+
+const searchFab = document.getElementById('searchFab');
+const searchPanel = document.getElementById('searchPanel');
+const searchInput = document.getElementById('searchInput');
+searchFab.addEventListener('click', ()=>{
+  searchPanel.classList.toggle('open');
+  if(searchPanel.classList.contains('open')){ searchInput.focus(); renderSearchResults(''); }
+});
+
+function renderSearchResults(q){
+  const results = document.getElementById('searchResults');
+  const query = q.trim().toLowerCase();
+  const matches = query ? places.filter(p=>p.title.toLowerCase().includes(query)) : places;
+  results.innerHTML = '';
+  if(!matches.length){ results.innerHTML = '<div class="search-empty">ไม่พบร้านที่ตรงกับคำค้นหา</div>'; return; }
+  matches.slice(0,20).forEach(p=>{
+    const item = document.createElement('div');
+    item.className = 'search-item';
+    item.innerHTML = `${escapeHtml(p.title)}<div class="si-cat">${escapeHtml(p.category||'')}</div>`;
+    item.addEventListener('click', ()=>{
+      map.flyTo([p.lat,p.lng], 15, {duration:1});
+      openSheet(p.id);
+      searchPanel.classList.remove('open');
+    });
+    results.appendChild(item);
+  });
+}
+searchInput.addEventListener('input', ()=> renderSearchResults(searchInput.value));
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+// สั่งคำนวณขนาดแผนที่ใหม่ทันทีที่โหลดเสร็จ
+window.addEventListener('load', () => {
+  setTimeout(() => { map.invalidateSize(); }, 300);
+});
+</script>
+</body>
+</html>
