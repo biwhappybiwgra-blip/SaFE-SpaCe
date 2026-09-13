@@ -164,7 +164,7 @@
   .leaflet-control-zoom{ margin-top:130px !important; }
 
   /* แก้บั๊กแผนที่เป็นลายตาราง: ทำสีเขียวโทนเดียวด้วย filter (ไม่พึ่ง div ซ้อนที่ขนาดไม่ครอบคลุมทุก tile) */
-  .leaflet-tile-pane{ filter: grayscale(100%) sepia(55%) hue-rotate(60deg) saturate(280%) brightness(1.05); }
+  .leaflet-tile-pane{ filter: grayscale(100%) sepia(40%) hue-rotate(60deg) saturate(120%) brightness(1.03); }
 </style>
 </head>
 <body>
@@ -319,9 +319,13 @@ provinces.forEach(([val,label])=>{
 });
 
 const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([13.2, 101.0], 6);
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-  maxZoom: 19, attribution: 'Tiles &copy; Esri'
+const baseLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+  maxZoom: 19, attribution: 'Tiles &copy; Esri', crossOrigin: true, updateWhenIdle: true, keepBuffer: 4
 }).addTo(map);
+// บาง tile อาจโหลดพลาดชั่วคราว (เครือข่าย/ถูกจำกัดจังหวะโหลด) — สั่งให้ลองโหลดซ้ำอัตโนมัติแทนที่จะปล่อยว่างค้างไว้
+baseLayer.on('tileerror', (e)=>{
+  setTimeout(()=>{ e.tile.src = e.tile.src; }, 800);
+});
 
 const ratchaburiOutline = [
   [13.90,99.75],[13.85,99.95],[13.70,100.05],[13.45,100.05],[13.20,99.95],
