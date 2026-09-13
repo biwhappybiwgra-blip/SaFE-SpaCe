@@ -16,9 +16,9 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
-<style>
+<style id="themeStyle">
   :root{
-    /* โทนสี Earth Tone สบายตา อ่านง่าย */
+    /* ธีมเริ่มต้น: Earth Sage */
     --bg-1: #FBF9F5;
     --bg-2: #F4EFE6;
     --yellow-soft: #FFF9EB;
@@ -68,9 +68,11 @@
   #locateBtn svg{ fill:#fff; }
   #statsBtn{ color:var(--ink); background:#fff; border:1px solid var(--yellow-border); }
 
+  /* ปุ่มแต้มสะสม & ร้านค้าธีม */
   .user-badge-pill{ display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700;
     background:var(--yellow-soft); border:1px solid var(--yellow-border); padding:8px 14px; border-radius:999px;
-    color:var(--brown); cursor:pointer; }
+    color:var(--brown); cursor:pointer; transition:transform 0.15s ease; }
+  .user-badge-pill:hover{ transform:scale(1.04); }
 
   .filters{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
   .filters::-webkit-scrollbar{display:none;}
@@ -88,7 +90,6 @@
   .pin-wrap svg{ display:block; }
   .user-dot{ width:16px; height:16px; border-radius:50%; background:#3B82F6; border:3px solid #fff; box-shadow:0 0 0 5px rgba(59,130,246,0.28); }
 
-  /* ปุ่มสลับโหมดขยายตัวหนังสือแผนที่ 2x */
   #toggleMapTextBtn{ position:absolute; left:18px; bottom:24px; z-index:1090;
     background:#fff; border:1.5px solid var(--brown); color:var(--brown); border-radius:999px;
     padding:10px 16px; font-family:'Sarabun',sans-serif; font-size:13.5px; font-weight:700;
@@ -233,6 +234,17 @@
   .thumb-del{ position:absolute; top:3px; right:3px; width:22px; height:22px; border-radius:50%;
     background:rgba(184,74,57,0.9); color:#fff; border:none; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 
+  /* การ์ดร้านค้าธีม */
+  .theme-card{ display:flex; align-items:center; justify-content:space-between; padding:12px; border-radius:14px;
+    border:1px solid var(--yellow-border); background:var(--yellow-soft); margin-bottom:10px; }
+  .theme-info{ display:flex; align-items:center; gap:10px; }
+  .theme-swatch{ width:32px; height:32px; border-radius:50%; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+  .theme-btn{ padding:6px 14px; border-radius:999px; font-family:'Sarabun',sans-serif; font-size:12.5px; font-weight:700;
+    border:none; cursor:pointer; transition:all 0.15s ease; }
+  .theme-btn.active{ background:#E4DDD3; color:#7A7067; cursor:default; }
+  .theme-btn.use{ background:var(--sage); color:#fff; }
+  .theme-btn.buy{ background:var(--brown); color:#fff; }
+
   .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0; }
   .stat-box{ background:var(--yellow-soft); border:1px solid var(--yellow-border); border-radius:14px; padding:14px; text-align:center; }
   .stat-num{ font-family:'Mali',sans-serif; font-size:26px; font-weight:700; color:var(--brown); }
@@ -263,8 +275,10 @@
   <div class="top-row">
     <div class="brand" id="brandLogo"><span class="dot"></span>SaFE SpaCe</div>
     <div class="select-group">
-      <div class="user-badge-pill" id="userBadgePill" title="คลิกดูคะแนนของคุณ">
+      <!-- เหรียญตราแต้มสะสม (กดเพื่อเปิดร้านค้าแลกธีม) -->
+      <div class="user-badge-pill" id="userBadgePill" title="คลิกเพื่อแลกเปลี่ยนธีม">
         <span id="userBadgeIcon">🌱</span> <span id="userPointsText">0 แต้ม</span>
+        <span style="font-size:11px;background:var(--brown);color:#fff;padding:2px 6px;border-radius:8px;">🎨 แลกธีม</span>
       </div>
       <select id="provinceSelect" aria-label="เลือกจังหวัด"></select>
       <select id="categorySelect" aria-label="เลือกประเภทร้าน">
@@ -413,6 +427,19 @@
   </div>
 </div>
 
+<!-- 🎨 Modal: ร้านค้าแลกธีมด้วยแต้มสะสม -->
+<div class="modal-overlay" id="themeShopModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>🎨 ร้านค้าแลกธีมสี (Theme Shop)</h3>
+      <button class="closeBtn" id="themeShopClose" style="background:none;border:none;font-size:18px;cursor:pointer;">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--ink-subtle);margin-bottom:14px;">นำแต้มจากการช่วยปักหมุดและยืนยันข้อมูลมาแลกเปลี่ยนธีมสีใหม่ๆ เพื่อประสบการณ์ใช้งานที่ถูกใจคุณ!</p>
+    
+    <div id="themeListContainer"></div>
+  </div>
+</div>
+
 <!-- Modal: แดชบอร์ดสถิติเมือง -->
 <div class="modal-overlay" id="statsModal">
   <div class="modal-card">
@@ -460,8 +487,87 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ---------- ระบบแต้มสะสมชุมชน ----------
+// ----------------------------------------------------
+// 🎨 ระบบจัดการธีมสีและการนำแต้มไปแลกซื้อ (Theme Rewards)
+// ----------------------------------------------------
+const THEMES = {
+  default: {
+    id: 'default',
+    name: '🌿 Earth Sage (คลาสสิก)',
+    cost: 0,
+    swatch: 'linear-gradient(135deg, #386641 50%, #754C29 50%)',
+    vars: {
+      '--bg-1': '#FBF9F5', '--bg-2': '#F4EFE6', '--yellow-soft': '#FFF9EB',
+      '--yellow-border': '#E8DECD', '--sage': '#386641', '--sage-dark': '#2B4E32',
+      '--sage-light': '#EBF4EC', '--brown': '#754C29', '--brown-dark': '#5C3A1E',
+      '--ink': '#221C18', '--ink-subtle': '#6E6359'
+    }
+  },
+  matcha: {
+    id: 'matcha',
+    name: '🍵 Matcha & Sand (มัทฉะละมุน)',
+    cost: 15,
+    swatch: 'linear-gradient(135deg, #4A6B3E 50%, #8A9E68 50%)',
+    vars: {
+      '--bg-1': '#F5F7F2', '--bg-2': '#EAF0E4', '--yellow-soft': '#EEF4E8',
+      '--yellow-border': '#D8E2CE', '--sage': '#4A6B3E', '--sage-dark': '#35502B',
+      '--sage-light': '#E3EDDC', '--brown': '#5E7A4A', '--brown-dark': '#445B33',
+      '--ink': '#1E261A', '--ink-subtle': '#5D6B57'
+    }
+  },
+  terracotta: {
+    id: 'terracotta',
+    name: '🌅 Warm Terracotta (ดินเผาอบอุ่น)',
+    cost: 30,
+    swatch: 'linear-gradient(135deg, #B3542E 50%, #8C3E1F 50%)',
+    vars: {
+      '--bg-1': '#FAF6F0', '--bg-2': '#F5ECE0', '--yellow-soft': '#FDF1E6',
+      '--yellow-border': '#E8D4C3', '--sage': '#B3542E', '--sage-dark': '#8E4020',
+      '--sage-light': '#FAE5DC', '--brown': '#8C3E1F', '--brown-dark': '#692B12',
+      '--ink': '#291710', '--ink-subtle': '#6B544C'
+    }
+  },
+  coastal: {
+    id: 'coastal',
+    name: '🌊 Coastal Breeze (ฟ้าครามอบอุ่น)',
+    cost: 45,
+    swatch: 'linear-gradient(135deg, #2C6E8A 50%, #468499 50%)',
+    vars: {
+      '--bg-1': '#F4F8FA', '--bg-2': '#E8F0F4', '--yellow-soft': '#EBF4F7',
+      '--yellow-border': '#D0DFE6', '--sage': '#2C6E8A', '--sage-dark': '#1F5064',
+      '--sage-light': '#E0EEF3', '--brown': '#3A6375', '--brown-dark': '#294857',
+      '--ink': '#14232B', '--ink-subtle': '#576770'
+    }
+  },
+  dark_cocoa: {
+    id: 'dark_cocoa',
+    name: '🌙 Dark Cocoa (โหมดถนอมสายตา)',
+    cost: 60,
+    swatch: 'linear-gradient(135deg, #24201D 50%, #4D3D32 50%)',
+    vars: {
+      '--bg-1': '#1F1B18', '--bg-2': '#2A2521', '--yellow-soft': '#362E28',
+      '--yellow-border': '#4A3F37', '--sage': '#5A8F65', '--sage-dark': '#44704D',
+      '--sage-light': '#364739', '--brown': '#C7966D', '--brown-dark': '#AA7B55',
+      '--ink': '#FAF7F2', '--ink-subtle': '#B5ABA2'
+    }
+  }
+};
+
 let userPoints = parseInt(localStorage.getItem('safescape_points') || '0', 10);
+let unlockedThemes = JSON.parse(localStorage.getItem('safescape_unlocked_themes') || '["default"]');
+let currentThemeId = localStorage.getItem('safescape_current_theme') || 'default';
+
+function applyTheme(themeId) {
+  const theme = THEMES[themeId] || THEMES.default;
+  const root = document.documentElement;
+  Object.entries(theme.vars).forEach(([prop, val]) => {
+    root.style.setProperty(prop, val);
+  });
+  currentThemeId = themeId;
+  localStorage.setItem('safescape_current_theme', themeId);
+}
+applyTheme(currentThemeId);
+
 function addPoints(pts, reason) {
   userPoints += pts;
   localStorage.setItem('safescape_points', userPoints.toString());
@@ -471,18 +577,82 @@ function addPoints(pts, reason) {
 
 function updateUserBadgeUI() {
   let badge = '🌱 อาสาสมัคร';
-  if (userPoints >= 50) badge = '👑 เสาหลักเมือง';
-  else if (userPoints >= 25) badge = '⭐ ผู้พิทักษ์ความเท่าเทียม';
-  else if (userPoints >= 10) badge = '🌟 นักสำรวจชุมชน';
+  if (userPoints >= 60) badge = '👑 เสาหลักเมือง';
+  else if (userPoints >= 30) badge = '⭐ ผู้พิทักษ์ความเท่าเทียม';
+  else if (userPoints >= 15) badge = '🌟 นักสำรวจชุมชน';
 
   document.getElementById('userBadgeIcon').textContent = badge.split(' ')[0];
   document.getElementById('userPointsText').textContent = `${userPoints} แต้ม (${badge.split(' ')[1]})`;
 }
 updateUserBadgeUI();
 
+// เปิดหน้าต่างร้านค้าแลกธีม
+const themeShopModal = document.getElementById('themeShopModal');
+const themeShopClose = document.getElementById('themeShopClose');
+
 document.getElementById('userBadgePill').addEventListener('click', () => {
-  alert(`คุณมีคะแนนผู้ช่วยเหลือชุมชน: ${userPoints} แต้ม\n\nเกณฑ์คะแนน:\n• ปักหมุดร้านใหม่: +10 แต้ม\n• ร่วมยืนยันข้อมูล: +5 แต้ม\n• เพิ่ม/อัปเดตรูปถ่าย: +3 แต้ม\n• แสดงความคิดเห็น: +2 แต้ม`);
+  renderThemeShop();
+  themeShopModal.classList.add('open');
 });
+themeShopClose.addEventListener('click', () => themeShopModal.classList.remove('open'));
+
+function renderThemeShop() {
+  const container = document.getElementById('themeListContainer');
+  container.innerHTML = '';
+
+  Object.values(THEMES).forEach(theme => {
+    const isUnlocked = unlockedThemes.includes(theme.id);
+    const isActive = currentThemeId === theme.id;
+
+    const card = document.createElement('div');
+    card.className = 'theme-card';
+
+    let actionBtn = '';
+    if (isActive) {
+      actionBtn = `<button class="theme-btn active">กำลังใช้งาน</button>`;
+    } else if (isUnlocked) {
+      actionBtn = `<button class="theme-btn use" onclick="selectTheme('${theme.id}')">✓ เลือกใช้</button>`;
+    } else {
+      actionBtn = `<button class="theme-btn buy" onclick="buyTheme('${theme.id}', ${theme.cost})">แลกซื้อ (${theme.cost} แต้ม)</button>`;
+    }
+
+    card.innerHTML = `
+      <div class="theme-info">
+        <div class="theme-swatch" style="background:${theme.swatch};"></div>
+        <div>
+          <div style="font-weight:700;font-size:14px;color:var(--ink);">${theme.name}</div>
+          <div style="font-size:12px;color:var(--ink-subtle);">${theme.cost === 0 ? 'ฟรี (เริ่มต้น)' : `ใช้ ${theme.cost} แต้ม`}</div>
+        </div>
+      </div>
+      <div>${actionBtn}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+window.selectTheme = function(themeId) {
+  applyTheme(themeId);
+  renderThemeShop();
+  showToast(`🎨 สลับใช้งาน ${THEMES[themeId].name} แล้ว!`);
+};
+
+window.buyTheme = function(themeId, cost) {
+  if (userPoints < cost) {
+    alert(`แต้มสะสมของคุณไม่เพียงพอ (ต้องการ ${cost} แต้ม แต่คุณมี ${userPoints} แต้ม)\n\nวิธีได้แต้มเพิ่ม:\n• ปักหมุดร้านใหม่ (+10)\n• ช่วยยืนยันข้อมูล (+5)\n• อัปเดตรูปถ่าย (+3)`);
+    return;
+  }
+
+  if (confirm(`ยืนยันการใช้ ${cost} แต้ม เพื่อปลดล็อกธีม ${THEMES[themeId].name}?`)) {
+    userPoints -= cost;
+    localStorage.setItem('safescape_points', userPoints.toString());
+    unlockedThemes.push(themeId);
+    localStorage.setItem('safescape_unlocked_themes', JSON.stringify(unlockedThemes));
+    applyTheme(themeId);
+    updateUserBadgeUI();
+    renderThemeShop();
+    showToast(`🎉 ปลดล็อกและเปิดใช้ธีมใหม่สำเร็จ!`);
+  }
+};
 
 // ---------- ไอคอน SVG ----------
 const ICONS = {
@@ -519,7 +689,8 @@ function categoryGlyph(category){
   }
 }
 
-// ข้อมูลเริ่มต้น
+// 🎯 ลบหมุดร้านจำลอง r1-r13 ออกทั้งหมดแล้ว!
+// คงไว้เฉพาะร้านจริงที่คุณสร้าง หรือจะโหลดเพิ่มจาก Firebase ของคุณโดยตรง
 let places = [
   { 
     id:'godeng_bansing', 
@@ -533,17 +704,7 @@ let places = [
     status:'verified', 
     votes:14, 
     comments:[{ name:'ชาวบ้านสิงห์', text:'ทางลาดขึ้นง่าย ห้องน้ำสะอาดมากครับ' }] 
-  },
-  { id:'r1', title:'ครัวคุณต๋อย 1935', lat:13.5363, lng:99.8175, category:'อาหารไทย', desc:'ร้านอาหารไทยชื่อดังติดสถานีรถไฟ อ.เมืองราชบุรี บรรยากาศย้อนยุค', photos:[], tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:true }, status:'verified', votes:8, comments:[] },
-  { id:'r2', title:'ตลาดสนามหญ้า', lat:13.5312, lng:99.8121, category:'ตลาด/สตรีทฟู้ด', desc:'แหล่งรวมร้านอาหารอร่อยที่มีชื่อเสียงของ อ.เมืองราชบุรี', photos:[], tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
-  { id:'r3', title:'เนื้อต้มบ้านสิงห์ เจ๊ติ๋ม', lat:13.5520, lng:99.7800, category:'อาหารไทย', desc:'ร้านเนื้อตุ๋น/เนื้อต้มชื่อดังย่านเขางู ราชบุรี', photos:[], tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r4', title:'ถนนคนเดินริมแม่น้ำแม่กลอง', lat:13.5378, lng:99.8163, category:'ตลาด/สตรีทฟู้ด', desc:'ถนนคนเดินริมแม่น้ำแม่กลอง แหล่งรวมของกินยามค่ำ', photos:[], tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
-  { id:'r5', title:'ครัวตะนาวศรี Cafe & Eatery', lat:13.5722, lng:99.3128, category:'คาเฟ่', desc:'ร้านอาหาร-คาเฟ่บรรยากาศเรือนกระจกใน อ.สวนผึ้ง', photos:[], tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r6', title:'คาเฟ่จุดแวะพักสวนผึ้ง (โมอาย)', lat:13.5600, lng:99.3200, category:'คาเฟ่', desc:'จุดแวะพักยอดนิยมของสวนผึ้ง เด่นด้วยรูปปั้นโมอาย', photos:[], tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
-  { id:'r7', title:'ครัวม่อนไข่', lat:13.6772, lng:99.8578, category:'อาหารไทย', desc:'ร้านดังของโพธาราม กว่า 20 ปี บรรยากาศอบอุ่น', photos:[], tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r8', title:'ก๋วยเตี๋ยวเนื้อน้ำแดงวัดช่องลม', lat:13.5320, lng:99.8030, category:'ก๋วยเตี๋ยว', desc:'ก๋วยเตี๋ยวเนื้อหน้าวัดช่องลม อ.เมืองราชบุรี', photos:[], tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r11', title:'เด่นไทยไอศกรีม', lat:13.5312, lng:99.8121, category:'ของหวาน/ไอศกรีม', desc:'ร้านไอศกรีมชื่อดัง ตลาดสนามหญ้า อ.เมืองราชบุรี', photos:[], tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
-  { id:'r13', title:'โรงพยาบาลราชบุรี', lat:13.5375, lng:99.8155, category:'โรงพยาบาล', desc:'โรงพยาบาลศูนย์ประจำจังหวัด ถ.สมบูรณ์กุล ต.หน้าเมือง', photos:[], tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:true, wide_door:true, has_night_lighting:true }, status:'verified', votes:20, comments:[] }
+  }
 ];
 
 const provinces = [
@@ -563,17 +724,15 @@ provinces.forEach(([val,label])=>{
   provSelect.appendChild(opt);
 });
 
-// เริ่มต้นแผนที่
+// เริ่มต้นแผนที่ (ใช้ Google Maps ภาษาไทย ที่มีชื่ออำเภอ ตำบล ถนน สถานที่สำคัญครบถ้วน)
 const map = L.map('map', { zoomControl:true, attributionControl:false }).setView([13.2, 101.0], 6);
 
-// 🗺️ เลเยอร์ที่ 1: Google Maps ภาษาไทย (คมชัด ชื่อถนนภาษาไทยใหญ่ ชัดเจน ไม่ล่ม)
 let googleNormalLayer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&hl=th&gl=TH&x={x}&y={y}&z={z}', {
   subdomains: ['0', '1', '2', '3'],
   maxZoom: 20,
   attribution: '&copy; Google Maps'
 });
 
-// 🔍 เลเยอร์ที่ 2: โหมดขยายตัวหนังสือแผนที่ 2 เท่า (Large Text Mode)
 let osmBigTextLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   tileSize: 512,
@@ -581,16 +740,13 @@ let osmBigTextLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.pn
   attribution: '&copy; OpenStreetMap'
 });
 
-// เลเยอร์สำรองกรณีมีปัญหา
 let osmBackupLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '&copy; OpenStreetMap'
 });
 
-// เพิ่ม Google Maps เป็นค่าเริ่มต้นทันที
 googleNormalLayer.addTo(map);
 
-// สลับโหมดขยายตัวหนังสือแผนที่
 let isBigTextMode = false;
 const toggleMapTextBtn = document.getElementById('toggleMapTextBtn');
 toggleMapTextBtn.addEventListener('click', () => {
@@ -610,7 +766,6 @@ toggleMapTextBtn.addEventListener('click', () => {
   }
 });
 
-// หาก Google Maps มีปัญหา ให้สลับไป OpenStreetMap ทันทีอัตโนมัติ
 googleNormalLayer.on('tileerror', () => {
   if (!map.hasLayer(osmBackupLayer)) {
     osmBackupLayer.addTo(map);
@@ -702,7 +857,7 @@ function compressImageFile(file) {
   });
 }
 
-// โหลดข้อมูลจาก Firebase
+// โหลดข้อมูลหมุดจริงของคุณจาก Firebase
 async function loadFromFirebase(){
   try {
     const snapshot = await db.collection('places').get();
@@ -730,7 +885,7 @@ async function loadFromFirebase(){
     refreshCategoryOptions();
     checkUrlForPlace();
   } catch(e) {
-    console.warn("ใช้ข้อมูลเริ่มต้นในเครื่อง:", e);
+    console.warn("โหลด Firebase:", e);
   }
 }
 
@@ -868,7 +1023,7 @@ function closeSheet(){ sheet.classList.remove('open'); currentId=null; }
 document.getElementById('sheetClose').addEventListener('click', closeSheet);
 
 // ----------------------------------------------------
-// 🌟 จัดการรูปถ่ายสถานที่ (สูงสุด 3 รูป)
+// 🌟 จัดการรูปถ่ายสถานที่
 // ----------------------------------------------------
 const photoManagerModal = document.getElementById('photoManagerModal');
 const btnOpenPhotoManager = document.getElementById('btnOpenPhotoManager');
@@ -1360,7 +1515,6 @@ function showToast(msg){
   setTimeout(()=> t.classList.remove('show'), 2200);
 }
 
-// สั่งคำนวณขนาดแผนที่ใหม่ทันทีที่โหลดเสร็จ
 window.addEventListener('load', () => {
   setTimeout(() => { map.invalidateSize(); }, 300);
 });
