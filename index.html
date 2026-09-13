@@ -173,7 +173,7 @@
   .comment-form button{ min-width:48px; min-height:44px; border-radius:10px; border:none; background:var(--sage);
     color:#fff; font-weight:700; cursor:pointer; font-size:14px; }
 
-  @media (max-width:768px){ #sheet{ left:0; right:0; bottom:0; border-radius:24px 24px 0 0; max-height:82vh; } }
+  @media (max-width:768px){ #sheet{ left:0; right:0; bottom:0; border-radius:22px 22px 0 0; max-height:82vh; } }
   @media (min-width:769px){
     #sheet{ left:18px; top:125px; width:360px; max-height:calc(100vh - 150px); border-radius:var(--radius); transform:translateX(-130%); }
     #sheet.open{ transform:translateX(0); }
@@ -323,7 +323,6 @@
         แจ้งชำรุด/ไม่ตรง
       </button>
     </div>
-    <!-- ปุ่มลบหมุดนี้ออกจากระบบ -->
     <button class="btn btn-delete" id="btnDeletePlace">🗑️ ลบหมุดนี้ออกจากระบบ</button>
   </div>
 
@@ -673,24 +672,31 @@ const TAG_ICON_KEY = { has_ramp:'ramp', has_gender_neutral_toilet:'toilet', has_
 document.getElementById('editTagsTitle').innerHTML = ICONS.wrench + 'ช่วยเติม/แก้ไขข้อมูลการเข้าถึง';
 document.getElementById('commentsTitle').innerHTML = ICONS.comment + 'ความคิดเห็น';
 
-// 🎯 แก้ไขไอคอนในหมุด: มีสัญลักษณ์คมชัดทุกหมวด และถ้าไม่ตรงจะแสดง "จุดสีขาวกลางหมุด" เสมอ ไม่โบ๋อีกต่อไป
+// 🎯 แก้ไอคอนสัญลักษณ์ในหมุด: ใช้ SVG เวกเตอร์แท้สีขาว คมชัด 100% ทุกเครื่อง ไม่หาย ไม่กลายเป็นวงกลมเปล่าอีกต่อไป
 function categoryGlyph(category){
   switch(category){
-    case 'ก๋วยเตี๋ยว': return `<text x="15" y="19" font-size="13" text-anchor="middle">🍜</text>`;
-    case 'อาหารไทย': return `<text x="15" y="19" font-size="13" text-anchor="middle">🍲</text>`;
-    case 'คาเฟ่': return `<text x="15" y="19" font-size="13" text-anchor="middle">☕</text>`;
-    case 'ตลาด/สตรีทฟู้ด': return `<text x="15" y="19" font-size="13" text-anchor="middle">🍢</text>`;
-    case 'ของหวาน/ไอศกรีม': return `<text x="15" y="19" font-size="13" text-anchor="middle">🍨</text>`;
-    case 'โรงพยาบาล': return `<text x="15" y="19" font-size="13" text-anchor="middle">🏥</text>`;
-    case 'ทางเท้าชำรุด/สิ่งกีดขวาง': return `<text x="15" y="19" font-size="13" text-anchor="middle">⚠️</text>`;
-    case 'จุดเปลี่ยว/ไฟทางดับ': return `<text x="15" y="19" font-size="13" text-anchor="middle">💡</text>`;
+    case 'ก๋วยเตี๋ยว':
+      return `<g fill="#fff"><path d="M9 13a6 6 0 0012 0H9z"/><path d="M10 10l10-2M10 12l10-1" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></g>`;
+    case 'คาเฟ่':
+      return `<g fill="#fff"><path d="M10 10h8v6a3 3 0 01-3 3h-2a3 3 0 01-3-3v-6z"/><path d="M18 11h1.5a1.5 1.5 0 010 3H18v-3z" fill="none" stroke="#fff" stroke-width="1.2"/></g>`;
+    case 'อาหารไทย':
+    case 'ตลาด/สตรีทฟู้ด':
+      return `<g fill="#fff"><path d="M9 14h12v1H9z"/><path d="M11 11a4 4 0 018 0H11z"/><circle cx="15" cy="9.5" r="1.2"/></g>`;
+    case 'ของหวาน/ไอศกรีม':
+      return `<g fill="#fff"><circle cx="15" cy="11" r="3"/><path d="M12.5 13L15 20l2.5-7z"/></g>`;
+    case 'โรงพยาบาล':
+      return `<g fill="#fff"><rect x="10" y="9" width="10" height="10" rx="2"/><path d="M15 11v6M12 14h6" stroke="var(--sage)" stroke-width="1.8" stroke-linecap="round"/></g>`;
+    case 'ทางเท้าชำรุด/สิ่งกีดขวาง':
+      return `<g fill="#fff"><path d="M15 8l6 11H9L15 8z"/><circle cx="15" cy="16.5" r="1" fill="#B84A39"/><path d="M15 11v3.5" stroke="#B84A39" stroke-width="1.5" stroke-linecap="round"/></g>`;
+    case 'จุดเปลี่ยว/ไฟทางดับ':
+      return `<g fill="#fff"><path d="M15 9a3.5 3.5 0 00-3.5 3.5c0 1.5 1 2.5 1.5 3.5h4c.5-1 1.5-2 1.5-3.5A3.5 3.5 0 0015 9z"/><rect x="13.5" y="17" width="3" height="1.5" rx=".5"/></g>`;
     default:
-      // ค่าเริ่มต้น: แสดงจุดวงกลมสีขาวชัดเจน ไม่ปล่อยให้หมุดว่างเปล่า!
-      return `<circle cx="15" cy="15" r="4.5" fill="#fff"/>`;
+      // ค่าเริ่มต้น: แสดงไอคอนวงกลมสีขาวชัดเจน ไม่ปล่อยให้หมุดว่างเปล่า!
+      return `<circle cx="15" cy="14" r="4.5" fill="#fff"/>`;
   }
 }
 
-// 🚫 บัญชีดำ (Blacklist): ดักจับ ID และชื่อร้านจำลองเดิมทั้งหมด เพื่อไม่ให้โหลดขึ้นแผนที่อีก!
+// 🚫 บัญชีดำ (Blacklist): ตัดหมุดจำลองเดิมทั้งหมดทิ้ง ไม่ให้ขึ้นแผนที่
 const MOCK_IDS = new Set(['r1','r2','r3','r4','r5','r6','r7','r8','r9','r10','r11','r12','r13']);
 const MOCK_TITLES = new Set([
   'ครัวคุณต๋อย 1935', 'ตลาดสนามหญ้า', 'เนื้อต้มบ้านสิงห์ เจ๊ติ๋ม',
@@ -700,7 +706,6 @@ const MOCK_TITLES = new Set([
   'ก๋วยเตี๋ยวหมูย่าง เฮียแอ๊ด', 'โรงพยาบาลราชบุรี'
 ]);
 
-// เริ่มต้นอาร์เรย์ว่าง (รอโหลดเฉพาะหมุดที่คุณสร้างจาก Firebase เท่านั้น)
 let places = [];
 
 const provinces = [
@@ -720,10 +725,11 @@ provinces.forEach(([val,label])=>{
   provSelect.appendChild(opt);
 });
 
-// แผนที่ Google Maps ภาษาไทย (แสดงชื่ออำเภอ ตำบล ถนน สถานที่สำคัญครบถ้วน)
+// 🗺️ แผนที่ Google Maps แบบคลีนตา (สั่งซ่อนหมุดธุรกิจ/ร้านค้าอื่นทั้งหมดด้วย apistyle=s.t:33|p.v:off)
+// จะแสดงเฉพาะ ถนน, ซอย, แม่น้ำ, ชื่อตำบล, และชื่ออำเภอ ไม่รกตาอีกต่อไป!
 const map = L.map('map', { zoomControl:true, attributionControl:false }).setView([13.2, 101.0], 6);
 
-let googleNormalLayer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&hl=th&gl=TH&x={x}&y={y}&z={z}', {
+let googleNormalLayer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&hl=th&gl=TH&apistyle=s.t:33|p.v:off&x={x}&y={y}&z={z}', {
   subdomains: ['0', '1', '2', '3'],
   maxZoom: 20,
   attribution: '&copy; Google Maps'
@@ -853,12 +859,11 @@ function compressImageFile(file) {
   });
 }
 
-// 🎯 โหลดเฉพาะหมุดที่คุณสร้างขึ้นจริงจาก Firebase (ข้ามหมุดจำลองเดิมทั้งหมด)
+// 🎯 โหลดเฉพาะหมุดของคุณจาก Firebase (ข้ามหมุดจำลองเดิมทั้งหมด)
 async function loadFromFirebase(){
   try {
     const snapshot = await db.collection('places').get();
     snapshot.forEach(doc => {
-      // ดักทิ้งหมุดจำลองเดิมทันที ไม่เอาขึ้นแผนที่
       if (MOCK_IDS.has(doc.id)) return;
 
       const data = doc.data();
@@ -1026,7 +1031,7 @@ function renderPills(p){
 function closeSheet(){ sheet.classList.remove('open'); currentId=null; }
 document.getElementById('sheetClose').addEventListener('click', closeSheet);
 
-// 🗑️ ปุ่มลบหมุดนี้ออกจากระบบถาวร (ลบจาก Firebase ทันที)
+// 🗑️ ปุ่มลบหมุดนี้ออกจากระบบถาวร
 document.getElementById('btnDeletePlace').addEventListener('click', async () => {
   if (!currentId) return;
   const p = places.find(x => x.id === currentId);
