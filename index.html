@@ -18,23 +18,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* โทนสี Earth Tone ปรับปรุงให้อ่านง่าย คมชัด และสบายตา */
-    --bg-1: #FBF9F5;            /* ครีมนวลสว่าง สบายตา */
-    --bg-2: #F4EFE6;            /* ทรายนวล / ครีมเข้ม */
-    --yellow-soft: #FFF9EB;     /* เหลืองอ่อนเนย นุ่มนวล สะอาดตา */
-    --yellow-border: #E8DECD;   /* สีขอบครีมบางเบา */
+    /* โทนสี Earth Tone อ่านง่าย สบายตา */
+    --bg-1: #FBF9F5;
+    --bg-2: #F4EFE6;
+    --yellow-soft: #FFF9EB;
+    --yellow-border: #E8DECD;
     
-    --sage: #386641;            /* เขียวธรรมชาติ สงบและคมชัดขึ้น */
+    --sage: #386641;
     --sage-dark: #2B4E32;
-    --sage-light: #EBF4EC;      /* เขียวพาสเทลสำหรับพื้นหลัง Badge */
+    --sage-light: #EBF4EC;
 
-    --brown: #754C29;           /* น้ำตาลไม้อบอุ่น ชัดเจน */
+    --brown: #754C29;
     --brown-dark: #5C3A1E;
     
-    --ink: #221C18;             /* น้ำตาลเข้มเอสเพรสโซ่ คมชัด อ่านง่ายมาก ไม่แสบตา */
-    --ink-subtle: #6E6359;      /* สีข้อความรอง */
-    --rust: #B84A39;            /* ส้มอิฐธรรมชาติ */
-    --pin-unverified: #A49B8D;  /* เทาอมน้ำตาล */
+    --ink: #221C18;
+    --ink-subtle: #6E6359;
+    --rust: #B84A39;
+    --pin-unverified: #A49B8D;
     
     --radius: 18px;
     --shadow: 0 4px 18px rgba(34, 28, 24, 0.08);
@@ -70,7 +70,6 @@
   .filters{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
   .filters::-webkit-scrollbar{display:none;}
   
-  /* ตัวกรองชิปโทนเหลืองอ่อน สว่าง สบายตา อ่านตัวหนังสือชัด */
   .chip{ flex:0 0 auto; display:flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600; color:var(--ink);
     background:var(--yellow-soft); border:1px solid var(--yellow-border); border-radius:999px; padding:9px 14px; min-height:44px;
     cursor:pointer; user-select:none; box-shadow:0 2px 8px rgba(34,28,24,0.05);
@@ -80,7 +79,10 @@
   .chip.active svg{ fill:#fff; }
   .chip:focus-visible{ outline:2px solid var(--brown); outline-offset:2px; }
 
-  .pin-wrap{ display:flex; flex-direction:column; align-items:center; filter:drop-shadow(0 3px 6px rgba(34,28,24,0.3)); }
+  /* ปรับหมุดไม่ให้มีกรอบเหลี่ยมสีขาว */
+  .custom-pin-icon { background: transparent !important; border: none !important; }
+  .pin-wrap{ display:flex; flex-direction:column; align-items:center; filter:drop-shadow(0 4px 6px rgba(34,28,24,0.35)); cursor: grab; }
+  .pin-wrap:active{ cursor: grabbing; }
   .pin-wrap svg{ display:block; }
   .user-dot{ width:16px; height:16px; border-radius:50%; background:#3B82F6; border:3px solid #fff;
     box-shadow:0 0 0 5px rgba(59,130,246,0.28); }
@@ -111,10 +113,12 @@
   .pill-empty{ font-size:12.5px; color:var(--ink-subtle); }
   
   .votes{ font-size:13px; color:var(--ink-subtle); margin:8px 0 14px; }
-  .action-row{ display:flex; gap:10px; margin-bottom:16px; }
+  
+  .action-row{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .btn-group-nav{ display:flex; gap:8px; }
   .btn{ flex:1; min-height:44px; border-radius:12px; border:none; font-family:'Sarabun',sans-serif; font-weight:700;
-    font-size:14.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px;
-    transition:all .15s ease; }
+    font-size:13.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;
+    transition:all .15s ease; text-decoration: none; }
   .btn svg{ fill:#fff; }
   .btn:active{ transform:scale(0.97); }
   
@@ -125,6 +129,10 @@
   
   .btn-nav{ background:var(--brown); color:#fff; }
   .btn-nav:hover{ background:var(--brown-dark); }
+  .btn-search-maps{ background:#fff; color:var(--brown); border:1.5px solid var(--brown); }
+  .btn-search-maps svg{ fill:var(--brown); }
+
+  .drag-hint { font-size: 12px; color: var(--sage); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
 
   .section-title{ font-family:'Mali',sans-serif; font-weight:700; font-size:14.5px; margin:0 0 10px;
     display:flex; align-items:center; gap:7px; color:var(--ink); }
@@ -200,9 +208,6 @@
     pointer-events:none; transition:opacity .25s ease, transform .25s ease; box-shadow:var(--shadow); }
   #toast.show{ opacity:1; transform:translate(-50%,0); }
   .leaflet-control-zoom{ margin-top:130px !important; }
-
-  /* นำฟิลเตอร์สีที่ทำให้แผนที่มัวออก ปล่อยให้แผนที่คมชัด สบายตาที่สุด */
-  .leaflet-tile{ /* คมชัด สะอาดตา */ }
 </style>
 </head>
 <body>
@@ -235,13 +240,18 @@
   <span class="status-badge" id="sheetStatus"></span>
   <h2 id="sheetTitle"></h2>
   <div class="cat" id="sheetCat"></div>
+  <div class="drag-hint">📍 สามารถแตะค้างที่หมุดบนแผนที่เพื่อลากปรับตำแหน่งได้</div>
   <img id="sheetPhoto" alt="">
   <p class="desc" id="sheetDesc"></p>
   <div class="pill-row" id="sheetPills"></div>
   <div class="votes" id="sheetVotes"></div>
+  
   <div class="action-row">
     <button class="btn btn-verify" id="btnVerify"></button>
-    <button class="btn btn-nav" id="btnNav"></button>
+    <div class="btn-group-nav">
+      <a class="btn btn-nav" id="btnNav" target="_blank"></a>
+      <a class="btn btn-search-maps" id="btnNavSearch" target="_blank">ค้นหาใน Maps</a>
+    </div>
   </div>
 
   <div class="section-title" id="editTagsTitle">ช่วยเติม/แก้ไขข้อมูลการเข้าถึง</div>
@@ -279,7 +289,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ---------- ไอคอน SVG กลางระบบ ----------
+// ---------- ไอคอน SVG ----------
 const ICONS = {
   ramp: '<svg class="ic" viewBox="0 0 20 20"><path d="M2 17h16v1H2z"/><path d="M2 17L13 6h2L4 17z"/><circle cx="4.6" cy="15.6" r="1.4"/></svg>',
   toilet: '<svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="5" r="2.3"/><path d="M6 18l1.2-8.5A2 2 0 019.2 8h1.6a2 2 0 012 1.5L14 18h-2l-.8-6h-2.4l-.8 6z"/></svg>',
@@ -308,21 +318,19 @@ function categoryGlyph(category){
     case 'ก๋วยเตี๋ยว': return `<g fill="#fff"><path d="M11 13a4 4 0 008 0z"/><path d="M11 13h8v1a1 1 0 01-1 1h-6a1 1 0 01-1-1z"/><path d="M13.3 7.8c0 1-1 1-1 2M16.7 7.8c0 1-1 1-1 2" stroke="#fff" stroke-width="0.9" fill="none" stroke-linecap="round"/></g>`;
     case 'ของหวาน/ไอศกรีม': return `<g fill="#fff"><circle cx="15" cy="9.3" r="3"/><path d="M12.5 10.7L15 18l2.5-7.3z"/></g>`;
     case 'โรงพยาบาล': return `<g><rect x="10" y="6" width="10" height="10" rx="2" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M15 8.3v5.4M12.3 11h5.4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></g>`;
-    case 'สถานีตำรวจ': return `<path d="M15 6l4 1.5v4c0 3.5-2 6-4 7-2-1-4-3.5-4-7v-4z" fill="#fff"/>`;
-    case 'ร้านซ่อมรถ': return `<path d="M17.8 7.3a3 3 0 00-4-3.6L12 5.5l1.7 1.7-1.4 1.4L10.6 6.9l-1.8 1.8a3 3 0 003.6 4L9 16.1v2.4h2.4l3.4-3.4a3 3 0 004-4l-1.9 1.9-1.7-1.7 1.9-1.9 1.7 1.7z" fill="#fff"/>`;
     default: return '';
   }
 }
 
-// ข้อมูลสถานที่ พร้อมร้าน "โกเด้งเส้นกะสั่ง (บ้านสิงห์)"
+// 🎯 พิกัดจริงของ "ร้านโกเด้งเส้นกะสั่ง" (120 ม.4 ถ.3335 บ้านสิงห์ โพธาราม)
 let places = [
   { 
     id:'godeng_bansing', 
     title:'ร้านโกเด้งเส้นกะสั่ง (บ้านสิงห์)', 
-    lat:13.6685, 
-    lng:99.8808, 
+    lat: 13.6732, 
+    lng: 99.8756, 
     category:'ก๋วยเตี๋ยว', 
-    desc:'ร้านก๋วยเตี๋ยวชื่อดัง ต.บ้านสิงห์ อ.โพธาราม จ.ราชบุรี มีทางลาดสะดวกสำหรับวีลแชร์ และห้องน้ำ All-Gender / LGBTQ+ เป็นมิตร สะอาด ปลอดภัยสำหรับทุกคน', 
+    desc:'ร้านก๋วยเตี๋ยวโกเด้งเส้นกะสั่ง (ครัวลุงยุ่ง) ถ.3335 หมู่ 4 ต.บ้านสิงห์ อ.โพธาราม มีทางลาดกว้างสำหรับวีลแชร์ และห้องน้ำ All-Gender / LGBTQ+ สะอาด ปลอดภัยสำหรับทุกคน', 
     photo:null, 
     tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:false, wide_door:true, has_night_lighting:true }, 
     status:'verified', 
@@ -332,21 +340,18 @@ let places = [
   { id:'r1', title:'ครัวคุณต๋อย 1935', lat:13.5363, lng:99.8175, category:'อาหารไทย', desc:'ร้านอาหารไทยชื่อดังติดสถานีรถไฟ อ.เมืองราชบุรี บรรยากาศย้อนยุค', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:true }, status:'verified', votes:8, comments:[] },
   { id:'r2', title:'ตลาดสนามหญ้า', lat:13.5312, lng:99.8121, category:'ตลาด/สตรีทฟู้ด', desc:'แหล่งรวมร้านอาหารอร่อยที่มีชื่อเสียงของ อ.เมืองราชบุรี เปิดตั้งแต่สายจนถึงค่ำ', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
   { id:'r3', title:'เนื้อต้มบ้านสิงห์ เจ๊ติ๋ม', lat:13.5520, lng:99.7800, category:'อาหารไทย', desc:'ร้านเนื้อตุ๋น/เนื้อต้มชื่อดังย่านเขางู ราชบุรี', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r4', title:'ตลาดโต้รุ่งริมแม่น้ำแม่กลอง', lat:13.5378, lng:99.8163, category:'ตลาด/สตรีทฟู้ด', desc:'ตลาดโต้รุ่งริมแม่น้ำแม่กลอง แหล่งรวมของกินยามค่ำคืน เช่น ปังก้อนทอง ข้าวต้มซุ่ยฮ้อเฮียโต', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
-  { id:'r5', title:'ครัวตะนาวศรี Cafe & Eatery', lat:13.5722, lng:99.3128, category:'คาเฟ่', desc:'ร้านอาหาร-คาเฟ่บรรยากาศเรือนกระจกใน อ.สวนผึ้ง เมนูเด็ดไข่เจียวกากหมู ไก่ตะนาวศรี', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r6', title:'คาเฟ่จุดแวะพักสวนผึ้ง (โมอาย)', lat:13.5600, lng:99.3200, category:'คาเฟ่', desc:'จุดแวะพักยอดนิยมของสวนผึ้ง มองเห็นวิวทั้งขาไปขากลับ เด่นด้วยรูปปั้นโมอาย', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
-  { id:'r7', title:'ครัวม่อนไข่', lat:13.6772, lng:99.8578, category:'อาหารไทย', desc:'ร้านดังของโพธาราม กว่า 20 ปี วัตถุดิบคัดสรรอย่างข้าวและผักกูด บรรยากาศเหมือนอยู่บนภูเขา', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r8', title:'ก๋วยเตี๋ยวเนื้อน้ำแดงวัดช่องลม', lat:13.5320, lng:99.8030, category:'ก๋วยเตี๋ยว', desc:'ก๋วยเตี๋ยวเนื้อใส่ซอสเย็นตาโฟ หน้าวัดช่องลม ต.หน้าเมือง อ.เมืองราชบุรี เปิดทุกวัน 8.00-14.00 น.', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r9', title:'ชุนเซ้งข้าวคลุกกะปิ', lat:13.5350, lng:99.8150, category:'อาหารไทย', desc:'ข้าวคลุกกะปิเครื่องแน่น ถ.ศรีสุริยวงศ์ ต.หน้าเมือง อ.เมืองราชบุรี เปิดทุกวัน 7.00-16.00 น.', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r10', title:'ร้านอาหารไหมไทย (หนามหญ้าโซไซตี้)', lat:13.5600, lng:99.8300, category:'อาหารไทย', desc:'ร้านอาหารไทย-จีน-ยุโรป บรรยากาศสบายๆ มีดนตรีสดทุกคืน ต.ดอนตะโก อ.เมืองราชบุรี', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
-  { id:'r11', title:'เด่นไทยไอศกรีม', lat:13.5312, lng:99.8121, category:'ของหวาน/ไอศกรีม', desc:'ร้านไอศกรีมชื่อดัง ตลาดสนามหญ้า ถ.วรเดช ต.หน้าเมือง อ.เมืองราชบุรี เปิด 14.00-02.00 น.', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
-  { id:'r12', title:'ก๋วยเตี๋ยวหมูย่าง เฮียแอ๊ด', lat:13.8129, lng:99.8781, category:'ก๋วยเตี๋ยว', desc:'ก๋วยเตี๋ยวหมูย่างเจ้าดังของ อ.บ้านโป่ง น้ำซุปเข้มข้น หมูย่างหมักสูตรร้าน', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r13', title:'โรงพยาบาลราชบุรี', lat:13.5375, lng:99.8155, category:'โรงพยาบาล', desc:'โรงพยาบาลศูนย์ประจำจังหวัด ขนาด 1,000 เตียง ถ.สมบูรณ์กุล ต.หน้าเมือง อ.เมืองราชบุรี', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:true, wide_door:true, has_night_lighting:true }, status:'verified', votes:20, comments:[] }
+  { id:'r4', title:'ตลาดโต้รุ่งริมแม่น้ำแม่กลอง', lat:13.5378, lng:99.8163, category:'ตลาด/สตรีทฟู้ด', desc:'ตลาดโต้รุ่งริมแม่น้ำแม่กลอง แหล่งรวมของกินยามค่ำคืน', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
+  { id:'r5', title:'ครัวตะนาวศรี Cafe & Eatery', lat:13.5722, lng:99.3128, category:'คาเฟ่', desc:'ร้านอาหาร-คาเฟ่บรรยากาศเรือนกระจกใน อ.สวนผึ้ง', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
+  { id:'r6', title:'คาเฟ่จุดแวะพักสวนผึ้ง (โมอาย)', lat:13.5600, lng:99.3200, category:'คาเฟ่', desc:'จุดแวะพักยอดนิยมของสวนผึ้ง เด่นด้วยรูปปั้นโมอาย', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
+  { id:'r7', title:'ครัวม่อนไข่', lat:13.6772, lng:99.8578, category:'อาหารไทย', desc:'ร้านดังของโพธาราม กว่า 20 ปี บรรยากาศอบอุ่น', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
+  { id:'r8', title:'ก๋วยเตี๋ยวเนื้อน้ำแดงวัดช่องลม', lat:13.5320, lng:99.8030, category:'ก๋วยเตี๋ยว', desc:'ก๋วยเตี๋ยวเนื้อหน้าวัดช่องลม อ.เมืองราชบุรี', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
+  { id:'r11', title:'เด่นไทยไอศกรีม', lat:13.5312, lng:99.8121, category:'ของหวาน/ไอศกรีม', desc:'ร้านไอศกรีมชื่อดัง ตลาดสนามหญ้า อ.เมืองราชบุรี', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
+  { id:'r13', title:'โรงพยาบาลราชบุรี', lat:13.5375, lng:99.8155, category:'โรงพยาบาล', desc:'โรงพยาบาลศูนย์ประจำจังหวัด ถ.สมบูรณ์กุล ต.หน้าเมือง', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:true, wide_door:true, has_night_lighting:true }, status:'verified', votes:20, comments:[] }
 ];
 
 const provinces = [
   ['thailand','🇹🇭 ประเทศไทย (ภาพรวม)', 13.2, 101.0, 6],
-  ['ratchaburi','📍 จ.ราชบุรี (บ้านสิงห์)', 13.6685, 99.8808, 14],
+  ['ratchaburi','📍 จ.ราชบุรี (บ้านสิงห์)', 13.6732, 99.8756, 16],
   ['กรุงเทพมหานคร',null,13.7563,100.5018,10],['สมุทรปราการ',null,13.5991,100.5998,10],
   ['นนทบุรี',null,13.8621,100.5144,10],['ปทุมธานี',null,14.0208,100.5250,10],
   ['พระนครศรีอยุธยา',null,14.3532,100.5680,10],['อ่างทอง',null,14.5896,100.4550,10],
@@ -369,7 +374,7 @@ provinces.forEach(([val,label])=>{
   provSelect.appendChild(opt);
 });
 
-// เริ่มต้นแผนที่ MapTiler เดิม
+// เริ่มต้นแผนที่ MapTiler
 const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([13.2, 101.0], 6);
 
 const baseLayer = L.tileLayer('https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=heBoKGgYEE6tSt7eXYza', {
@@ -391,7 +396,6 @@ const outlineLayer = L.polygon(ratchaburiOutline, { color:'#E8DECD', weight:2.5,
 
 const markers = {};
 function pinIcon(status, category){
-  // หมุดสี Earth Tone: เขียวสงบ / ส้มอิฐ / เทาน้ำตาล
   const fill = status==='verified' ? '#386641' : status==='disputed' ? '#B84A39' : '#A49B8D';
   const glyph = categoryGlyph(category);
   const svg = `<svg width="30" height="38" viewBox="0 0 30 38" xmlns="http://www.w3.org/2000/svg">
@@ -399,14 +403,50 @@ function pinIcon(status, category){
     <path d="M15 37 L9 21 L21 21 Z" fill="${fill}"/>
     ${glyph}
   </svg>`;
-  return L.divIcon({ html:`<div class="pin-wrap">${svg}</div>`, className:'', iconSize:[30,38], iconAnchor:[15,37] });
+  return L.divIcon({ 
+    html:`<div class="pin-wrap">${svg}</div>`, 
+    className:'custom-pin-icon', 
+    iconSize:[30,38], 
+    iconAnchor:[15,37] 
+  });
 }
 
+// วาดหมุด + เปิดให้ลากหมุดปรับพิกัดได้เอง
 function renderMarker(p){
   if(markers[p.id]) map.removeLayer(markers[p.id]);
-  const m = L.marker([p.lat, p.lng], { icon: pinIcon(p.status, p.category) }).addTo(map);
+  
+  const m = L.marker([p.lat, p.lng], { 
+    icon: pinIcon(p.status, p.category),
+    draggable: true // สามารถลากหมุดไปวางจุดที่ถูกต้องได้!
+  }).addTo(map);
+
   m.on('click', ()=> openSheet(p.id));
+
+  // เมื่อลากหมุดเสร็จ จะอัปเดตพิกัดใหม่ทันที
+  m.on('dragend', async (e) => {
+    const newPos = e.target.getLatLng();
+    p.lat = Number(newPos.lat.toFixed(6));
+    p.lng = Number(newPos.lng.toFixed(6));
+    showToast(`📍 ปรับพิกัดใหม่เป็น: ${p.lat}, ${p.lng}`);
+    updateNavLinks(p);
+    try {
+      await db.collection('places').doc(p.id).set({ lat: p.lat, lng: p.lng }, { merge: true });
+    } catch(err) {}
+  });
+
   markers[p.id] = m;
+}
+
+// ฟังก์ชันอัปเดตลิงก์นำทาง Google Maps
+function updateNavLinks(p) {
+  // 1. นำทาง GPS ไปยังพิกัดหมุดตรงเป๊ะ
+  const navBtn = document.getElementById('btnNav');
+  navBtn.innerHTML = ICONS.nav + ' นำทาง GPS';
+  navBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`;
+
+  // 2. ค้นหาชื่อร้านใน Google Maps
+  const searchBtn = document.getElementById('btnNavSearch');
+  searchBtn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.title + ' บ้านสิงห์ ราชบุรี')}`;
 }
 
 // โหลดข้อมูลจาก Firebase
@@ -417,6 +457,7 @@ async function loadFromFirebase(){
       const data = doc.data();
       const p = places.find(x => x.id === doc.id);
       if(p) {
+        if(data.lat && data.lng) { p.lat = data.lat; p.lng = data.lng; }
         if(data.tags) p.tags = { ...p.tags, ...data.tags };
         if(data.votes !== undefined) p.votes = data.votes;
         if(data.status) p.status = data.status;
@@ -510,10 +551,10 @@ function openSheet(id){
   statusEl.textContent = p.status==='verified' ? '✓ ชุมชนยืนยันแล้ว' : p.status==='disputed' ? '⚠ มีการแจ้งข้อมูลคลาดเคลื่อน' : '• รอการยืนยัน';
   document.getElementById('sheetVotes').textContent = `ยืนยันแล้ว ${p.votes} คน`;
   renderPills(p);
-  document.getElementById('btnNav').innerHTML = ICONS.nav + 'นำทาง Google Maps';
-  document.getElementById('btnNav').onclick = ()=>{
-    window.open(`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`, '_blank');
-  };
+  
+  // อัปเดตปุ่ม Google Maps
+  updateNavLinks(p);
+
   const verifyBtn = document.getElementById('btnVerify');
   if(verifiedByMe.has(id)){
     verifyBtn.disabled = true; verifyBtn.innerHTML = ICONS.verify + 'คุณยืนยันแล้ว';
@@ -690,7 +731,7 @@ function showToast(msg){
   setTimeout(()=> t.classList.remove('show'), 2200);
 }
 
-// สั่งคำนวณแผนที่ใหม่ทันทีที่โหลดเสร็จ
+// สั่งคำนวณขนาดแผนที่ใหม่ทันทีที่โหลดเสร็จ
 window.addEventListener('load', () => {
   setTimeout(() => { map.invalidateSize(); }, 300);
 });
