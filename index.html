@@ -77,8 +77,7 @@
   .chip.active svg{ fill:#fff; }
 
   .custom-pin-icon { background: transparent !important; border: none !important; }
-  .pin-wrap{ display:flex; flex-direction:column; align-items:center; filter:drop-shadow(0 3px 6px rgba(34,28,24,0.35)); cursor: grab; }
-  .pin-wrap:active{ cursor: grabbing; }
+  .pin-wrap{ display:flex; flex-direction:column; align-items:center; filter:drop-shadow(0 3px 6px rgba(34,28,24,0.35)); }
   .pin-wrap svg{ display:block; }
   .user-dot{ width:16px; height:16px; border-radius:50%; background:#3B82F6; border:3px solid #fff; box-shadow:0 0 0 5px rgba(59,130,246,0.28); }
 
@@ -103,8 +102,7 @@
   .status-badge.disputed{ background:rgba(184,74,57,0.14); color:var(--rust); border:1px solid rgba(184,74,57,0.25); }
 
   #sheet h2{ font-family:'Mali',sans-serif; font-weight:700; font-size:22px; margin:0 0 4px; padding-right:34px; color:var(--ink); }
-  #sheet .cat{ font-size:13.5px; color:var(--brown); font-weight:600; margin-bottom:6px; }
-  .drag-hint { font-size: 12px; color: var(--sage); margin-bottom: 10px; }
+  #sheet .cat{ font-size:13.5px; color:var(--brown); font-weight:600; margin-bottom:10px; }
 
   .sheet-gallery{ display:flex; gap:8px; overflow-x:auto; margin-bottom:12px; padding-bottom:4px; scroll-snap-type:x mandatory; scrollbar-width:none; }
   .sheet-gallery::-webkit-scrollbar{ display:none; }
@@ -210,6 +208,12 @@
   #pinModeBanner button{ background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:999px;
     padding:5px 12px; font-size:12px; cursor:pointer; font-family:'Sarabun',sans-serif; }
 
+  #movePinBanner{ position:absolute; top:84px; left:50%; transform:translateX(-50%); z-index:1250;
+    background:var(--ink); color:#fff; padding:10px 20px; border-radius:999px; font-size:13.5px; font-weight:600;
+    display:none; align-items:center; gap:10px; box-shadow:0 6px 20px rgba(0,0,0,0.25); }
+  #movePinBanner button{ background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:999px;
+    padding:5px 12px; font-size:12px; cursor:pointer; font-family:'Sarabun',sans-serif; }
+
   .modal-overlay{ position:fixed; inset:0; z-index:1300; background:rgba(34,28,24,0.45); backdrop-filter:blur(3px);
     display:none; align-items:center; justify-content:center; padding:16px; }
   .modal-overlay.open{ display:flex; }
@@ -266,6 +270,11 @@
   <button id="cancelPinMode">ยกเลิก</button>
 </div>
 
+<div id="movePinBanner">
+  <span>📍 ลากหมุดไปยังจุดใหม่ แล้วปล่อยเพื่อยืนยัน</span>
+  <button id="btnCancelMovePin">ยกเลิก</button>
+</div>
+
 <header>
   <div class="top-row">
     <div class="brand" id="brandLogo"><span class="dot"></span>SaFE SpaCe</div>
@@ -293,8 +302,9 @@
   <span class="status-badge" id="sheetStatus"></span>
   <h2 id="sheetTitle"></h2>
   <div class="cat" id="sheetCat"></div>
-  <div class="drag-hint">📍 สามารถแตะค้างที่หมุดบนแผนที่เพื่อลากปรับตำแหน่งได้</div>
   
+  <button class="btn btn-search-maps" id="btnStartMovePin" style="width:100%;margin-bottom:12px;border-style:dashed;">📍 ปรับ/ย้ายตำแหน่งหมุดนี้</button>
+
   <div class="sheet-gallery" id="sheetGallery"></div>
   <button class="btn-manage-photos" id="btnOpenPhotoManager">📷 เพิ่ม/แก้ไขรูปถ่ายสถานที่ (สูงสุด 3 รูป)</button>
 
@@ -793,24 +803,74 @@ function renderMarker(p){
   
   const m = L.marker([p.lat, p.lng], { 
     icon: pinIcon(p.status, p.category),
-    draggable: true
+    draggable: false
   }).addTo(map);
 
   m.on('click', ()=> openSheet(p.id));
 
-  m.on('dragend', async (e) => {
-    const newPos = e.target.getLatLng();
-    p.lat = Number(newPos.lat.toFixed(6));
-    p.lng = Number(newPos.lng.toFixed(6));
-    showToast(`📍 ปรับพิกัดใหม่เป็น: ${p.lat}, ${p.lng}`);
-    updateNavLinks(p);
-    try {
-      await db.collection('places').doc(p.id).set({ lat: p.lat, lng: p.lng }, { merge: true });
-    } catch(err) {}
-  });
-
   markers[p.id] = m;
 }
+
+let activeMovingMarker = null;
+let originalPinPos = null;
+let movingPlace = null;
+
+const btnStartMovePin = document.getElementById('btnStartMovePin');
+const movePinBanner = document.getElementById('movePinBanner');
+const btnCancelMovePin = document.getElementById('btnCancelMovePin');
+
+btnStartMovePin.addEventListener('click', () => {
+  if (!currentId) return;
+  movingPlace = places.find(x => x.id === currentId);
+  activeMovingMarker = markers[currentId];
+  if (!movingPlace || !activeMovingMarker) return;
+
+  originalPinPos = activeMovingMarker.getLatLng();
+  activeMovingMarker.dragging.enable();
+  closeSheet();
+  movePinBanner.style.display = 'flex';
+  showToast('📍 ลากหมุดไปยังจุดใหม่ แล้วปล่อยเพื่อยืนยัน');
+
+  activeMovingMarker.once('dragend', async (e) => {
+    const newPos = e.target.getLatLng();
+    const confirmed = confirm(`ยืนยันการย้ายหมุด "${movingPlace.title}" มาที่ตำแหน่งใหม่นี้หรือไม่?\n\nพิกัดใหม่: ${newPos.lat.toFixed(5)}, ${newPos.lng.toFixed(5)}`);
+    
+    if (confirmed) {
+      movingPlace.lat = Number(newPos.lat.toFixed(6));
+      movingPlace.lng = Number(newPos.lng.toFixed(6));
+      updateNavLinks(movingPlace);
+      showToast('กำลังบันทึกตำแหน่งใหม่...');
+      try {
+        await db.collection('places').doc(movingPlace.id).set({ lat: movingPlace.lat, lng: movingPlace.lng }, { merge: true });
+        showToast('✅ ย้ายตำแหน่งหมุดเรียบร้อยแล้ว');
+      } catch(err) {
+        activeMovingMarker.setLatLng(originalPinPos);
+        showToast('บันทึกไม่สำเร็จ');
+      }
+    } else {
+      activeMovingMarker.setLatLng(originalPinPos);
+      showToast('ยกเลิกการย้ายตำแหน่ง หมุดกลับสู่จุดเดิม');
+    }
+
+    activeMovingMarker.dragging.disable();
+    movePinBanner.style.display = 'none';
+    activeMovingMarker = null;
+    movingPlace = null;
+    originalPinPos = null;
+  });
+});
+
+btnCancelMovePin.addEventListener('click', () => {
+  if (activeMovingMarker && originalPinPos) {
+    activeMovingMarker.setLatLng(originalPinPos);
+    activeMovingMarker.dragging.disable();
+  }
+  movePinBanner.style.display = 'none';
+  activeMovingMarker = null;
+  movingPlace = null;
+  originalPinPos = null;
+  showToast('ยกเลิกการย้ายตำแหน่ง');
+});
 
 function updateNavLinks(p) {
   const navBtn = document.getElementById('btnNav');
