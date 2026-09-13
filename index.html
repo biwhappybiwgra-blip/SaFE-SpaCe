@@ -162,6 +162,9 @@
     pointer-events:none; transition:opacity .25s ease, transform .25s ease; box-shadow:var(--shadow); }
   #toast.show{ opacity:1; transform:translate(-50%,0); }
   .leaflet-control-zoom{ margin-top:130px !important; }
+
+  /* แก้บั๊กแผนที่เป็นลายตาราง: ทำสีเขียวโทนเดียวด้วย filter (ไม่พึ่ง div ซ้อนที่ขนาดไม่ครอบคลุมทุก tile) */
+  .leaflet-tile-pane{ filter: grayscale(100%) sepia(55%) hue-rotate(60deg) saturate(280%) brightness(1.05); }
 </style>
 </head>
 <body>
@@ -319,14 +322,6 @@ const map = L.map('map', { zoomControl:true, attributionControl:true }).setView(
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
   maxZoom: 19, attribution: 'Tiles &copy; Esri'
 }).addTo(map);
-
-(function tintMapGreen(){
-  const tilePane = map.getPane('tilePane');
-  const tint = document.createElement('div');
-  tint.style.cssText = 'position:absolute;inset:0;background:#6A8E72;mix-blend-mode:color;pointer-events:none;';
-  tilePane.appendChild(tint);
-})();
-
 
 const ratchaburiOutline = [
   [13.90,99.75],[13.85,99.95],[13.70,100.05],[13.45,100.05],[13.20,99.95],
