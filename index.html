@@ -68,7 +68,6 @@
   #locateBtn svg{ fill:#fff; }
   #statsBtn{ color:var(--ink); background:#fff; border:1px solid var(--yellow-border); }
 
-  /* ปุ่มแต้มสะสม & ร้านค้าธีม */
   .user-badge-pill{ display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700;
     background:var(--yellow-soft); border:1px solid var(--yellow-border); padding:8px 14px; border-radius:999px;
     color:var(--brown); cursor:pointer; transition:transform 0.15s ease; }
@@ -150,6 +149,7 @@
   .btn-share svg{ fill:var(--brown); }
   .btn-report{ background:#fff; color:var(--rust); border:1px solid rgba(184,74,57,0.3); }
   .btn-report svg{ fill:var(--rust); }
+  .btn-delete{ background:#fff; color:var(--rust); border:1px solid var(--rust); width:100%; margin-top:4px; }
 
   .section-title{ font-family:'Mali',sans-serif; font-weight:700; font-size:15px; margin:0 0 8px;
     display:flex; align-items:center; gap:6px; color:var(--ink); }
@@ -234,7 +234,6 @@
   .thumb-del{ position:absolute; top:3px; right:3px; width:22px; height:22px; border-radius:50%;
     background:rgba(184,74,57,0.9); color:#fff; border:none; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 
-  /* การ์ดร้านค้าธีม */
   .theme-card{ display:flex; align-items:center; justify-content:space-between; padding:12px; border-radius:14px;
     border:1px solid var(--yellow-border); background:var(--yellow-soft); margin-bottom:10px; }
   .theme-info{ display:flex; align-items:center; gap:10px; }
@@ -275,7 +274,6 @@
   <div class="top-row">
     <div class="brand" id="brandLogo"><span class="dot"></span>SaFE SpaCe</div>
     <div class="select-group">
-      <!-- เหรียญตราแต้มสะสม (กดเพื่อเปิดร้านค้าแลกธีม) -->
       <div class="user-badge-pill" id="userBadgePill" title="คลิกเพื่อแลกเปลี่ยนธีม">
         <span id="userBadgeIcon">🌱</span> <span id="userPointsText">0 แต้ม</span>
         <span style="font-size:11px;background:var(--brown);color:#fff;padding:2px 6px;border-radius:8px;">🎨 แลกธีม</span>
@@ -325,6 +323,8 @@
         แจ้งชำรุด/ไม่ตรง
       </button>
     </div>
+    <!-- ปุ่มลบหมุดนี้ออกจากระบบ -->
+    <button class="btn btn-delete" id="btnDeletePlace">🗑️ ลบหมุดนี้ออกจากระบบ</button>
   </div>
 
   <div class="section-title" id="editTagsTitle">ช่วยเติม/แก้ไขข้อมูลการเข้าถึง</div>
@@ -427,7 +427,7 @@
   </div>
 </div>
 
-<!-- 🎨 Modal: ร้านค้าแลกธีมด้วยแต้มสะสม -->
+<!-- Modal: ร้านค้าแลกธีม -->
 <div class="modal-overlay" id="themeShopModal">
   <div class="modal-card">
     <div class="modal-header">
@@ -435,7 +435,6 @@
       <button class="closeBtn" id="themeShopClose" style="background:none;border:none;font-size:18px;cursor:pointer;">✕</button>
     </div>
     <p style="font-size:13px;color:var(--ink-subtle);margin-bottom:14px;">นำแต้มจากการช่วยปักหมุดและยืนยันข้อมูลมาแลกเปลี่ยนธีมสีใหม่ๆ เพื่อประสบการณ์ใช้งานที่ถูกใจคุณ!</p>
-    
     <div id="themeListContainer"></div>
   </div>
 </div>
@@ -488,7 +487,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // ----------------------------------------------------
-// 🎨 ระบบจัดการธีมสีและการนำแต้มไปแลกซื้อ (Theme Rewards)
+// 🎨 ร้านค้าแลกธีมสี
 // ----------------------------------------------------
 const THEMES = {
   default: {
@@ -586,7 +585,6 @@ function updateUserBadgeUI() {
 }
 updateUserBadgeUI();
 
-// เปิดหน้าต่างร้านค้าแลกธีม
 const themeShopModal = document.getElementById('themeShopModal');
 const themeShopClose = document.getElementById('themeShopClose');
 
@@ -638,7 +636,7 @@ window.selectTheme = function(themeId) {
 
 window.buyTheme = function(themeId, cost) {
   if (userPoints < cost) {
-    alert(`แต้มสะสมของคุณไม่เพียงพอ (ต้องการ ${cost} แต้ม แต่คุณมี ${userPoints} แต้ม)\n\nวิธีได้แต้มเพิ่ม:\n• ปักหมุดร้านใหม่ (+10)\n• ช่วยยืนยันข้อมูล (+5)\n• อัปเดตรูปถ่าย (+3)`);
+    alert(`แต้มของคุณไม่พอ (ต้องการ ${cost} แต้ม แต่คุณมี ${userPoints} แต้ม)`);
     return;
   }
 
@@ -650,11 +648,11 @@ window.buyTheme = function(themeId, cost) {
     applyTheme(themeId);
     updateUserBadgeUI();
     renderThemeShop();
-    showToast(`🎉 ปลดล็อกและเปิดใช้ธีมใหม่สำเร็จ!`);
+    showToast(`🎉 ปลดล็อกธีมสำเร็จ!`);
   }
 };
 
-// ---------- ไอคอน SVG ----------
+// ---------- ไอคอน SVG กลางระบบ ----------
 const ICONS = {
   ramp: '<svg class="ic" viewBox="0 0 20 20"><path d="M2 17h16v1H2z"/><path d="M2 17L13 6h2L4 17z"/><circle cx="4.6" cy="15.6" r="1.4"/></svg>',
   toilet: '<svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="5" r="2.3"/><path d="M6 18l1.2-8.5A2 2 0 019.2 8h1.6a2 2 0 012 1.5L14 18h-2l-.8-6h-2.4l-.8 6z"/></svg>',
@@ -675,37 +673,35 @@ const TAG_ICON_KEY = { has_ramp:'ramp', has_gender_neutral_toilet:'toilet', has_
 document.getElementById('editTagsTitle').innerHTML = ICONS.wrench + 'ช่วยเติม/แก้ไขข้อมูลการเข้าถึง';
 document.getElementById('commentsTitle').innerHTML = ICONS.comment + 'ความคิดเห็น';
 
+// 🎯 แก้ไขไอคอนในหมุด: มีสัญลักษณ์คมชัดทุกหมวด และถ้าไม่ตรงจะแสดง "จุดสีขาวกลางหมุด" เสมอ ไม่โบ๋อีกต่อไป
 function categoryGlyph(category){
   switch(category){
-    case 'อาหารไทย': return `<g fill="#fff"><ellipse cx="15" cy="9.3" rx="2.1" ry="3.7"/><ellipse cx="15" cy="9.3" rx="2.1" ry="3.7" transform="rotate(72 15 13)"/><circle cx="15" cy="13" r="1.5"/></g>`;
-    case 'ตลาด/สตรีทฟู้ด': return `<g fill="#fff"><rect x="14.3" y="7.5" width="1.3" height="9" rx="0.6" transform="rotate(-18 15 13)"/><ellipse cx="14.4" cy="8.2" rx="1.5" ry="2" transform="rotate(-18 15 13)"/></g>`;
-    case 'คาเฟ่': return `<g fill="#fff"><path d="M12 10h6l-1 8h-4z"/><circle cx="15" cy="16.7" r="0.65"/></g>`;
-    case 'ก๋วยเตี๋ยว': return `<g fill="#fff"><path d="M11 13a4 4 0 008 0z"/><path d="M11 13h8v1a1 1 0 01-1 1h-6a1 1 0 01-1-1z"/></g>`;
-    case 'ของหวาน/ไอศกรีม': return `<g fill="#fff"><circle cx="15" cy="9.3" r="3"/><path d="M12.5 10.7L15 18l2.5-7.3z"/></g>`;
-    case 'โรงพยาบาล': return `<g><rect x="10" y="6" width="10" height="10" rx="2" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M15 8.3v5.4M12.3 11h5.4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></g>`;
-    case 'ทางเท้าชำรุด/สิ่งกีดขวาง': return `<path d="M15 6L21 18H9L15 6z" fill="#fff"/><circle cx="15" cy="15" r="1" fill="#B84A39"/>`;
-    case 'จุดเปลี่ยว/ไฟทางดับ': return `<path d="M15 6a4 4 0 00-4 4c0 2 2 3 2 4h4c0-1 2-2 2-4a4 4 0 00-4-4z" fill="#fff"/>`;
-    default: return '';
+    case 'ก๋วยเตี๋ยว': return `<text x="15" y="19" font-size="13" text-anchor="middle">🍜</text>`;
+    case 'อาหารไทย': return `<text x="15" y="19" font-size="13" text-anchor="middle">🍲</text>`;
+    case 'คาเฟ่': return `<text x="15" y="19" font-size="13" text-anchor="middle">☕</text>`;
+    case 'ตลาด/สตรีทฟู้ด': return `<text x="15" y="19" font-size="13" text-anchor="middle">🍢</text>`;
+    case 'ของหวาน/ไอศกรีม': return `<text x="15" y="19" font-size="13" text-anchor="middle">🍨</text>`;
+    case 'โรงพยาบาล': return `<text x="15" y="19" font-size="13" text-anchor="middle">🏥</text>`;
+    case 'ทางเท้าชำรุด/สิ่งกีดขวาง': return `<text x="15" y="19" font-size="13" text-anchor="middle">⚠️</text>`;
+    case 'จุดเปลี่ยว/ไฟทางดับ': return `<text x="15" y="19" font-size="13" text-anchor="middle">💡</text>`;
+    default:
+      // ค่าเริ่มต้น: แสดงจุดวงกลมสีขาวชัดเจน ไม่ปล่อยให้หมุดว่างเปล่า!
+      return `<circle cx="15" cy="15" r="4.5" fill="#fff"/>`;
   }
 }
 
-// 🎯 ลบหมุดร้านจำลอง r1-r13 ออกทั้งหมดแล้ว!
-// คงไว้เฉพาะร้านจริงที่คุณสร้าง หรือจะโหลดเพิ่มจาก Firebase ของคุณโดยตรง
-let places = [
-  { 
-    id:'godeng_bansing', 
-    title:'ร้านโกเด้งเส้นกะสั่ง (บ้านสิงห์)', 
-    lat: 13.6732, 
-    lng: 99.8756, 
-    category:'ก๋วยเตี๋ยว', 
-    desc:'ร้านก๋วยเตี๋ยวโกเด้งเส้นกะสั่ง (ครัวลุงยุ่ง) ถ.3335 หมู่ 4 ต.บ้านสิงห์ อ.โพธาราม มีทางลาดกว้างสำหรับวีลแชร์ และห้องน้ำ All-Gender / LGBTQ+ สะอาด ปลอดภัยสำหรับทุกคน', 
-    photos:[], 
-    tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:false, wide_door:true, has_night_lighting:true }, 
-    status:'verified', 
-    votes:14, 
-    comments:[{ name:'ชาวบ้านสิงห์', text:'ทางลาดขึ้นง่าย ห้องน้ำสะอาดมากครับ' }] 
-  }
-];
+// 🚫 บัญชีดำ (Blacklist): ดักจับ ID และชื่อร้านจำลองเดิมทั้งหมด เพื่อไม่ให้โหลดขึ้นแผนที่อีก!
+const MOCK_IDS = new Set(['r1','r2','r3','r4','r5','r6','r7','r8','r9','r10','r11','r12','r13']);
+const MOCK_TITLES = new Set([
+  'ครัวคุณต๋อย 1935', 'ตลาดสนามหญ้า', 'เนื้อต้มบ้านสิงห์ เจ๊ติ๋ม',
+  'ถนนคนเดินริมแม่น้ำแม่กลอง', 'ตลาดโต้รุ่งริมแม่น้ำแม่กลอง', 'ครัวตะนาวศรี Cafe & Eatery',
+  'คาเฟ่จุดแวะพักสวนผึ้ง (โมอาย)', 'ครัวม่อนไข่', 'ก๋วยเตี๋ยวเนื้อน้ำแดงวัดช่องลม',
+  'ชุนเซ้งข้าวคลุกกะปิ', 'ร้านอาหารไหมไทย (หนามหญ้าโซไซตี้)', 'เด่นไทยไอศกรีม',
+  'ก๋วยเตี๋ยวหมูย่าง เฮียแอ๊ด', 'โรงพยาบาลราชบุรี'
+]);
+
+// เริ่มต้นอาร์เรย์ว่าง (รอโหลดเฉพาะหมุดที่คุณสร้างจาก Firebase เท่านั้น)
+let places = [];
 
 const provinces = [
   ['thailand','🇹🇭 ประเทศไทย (ภาพรวม)', 13.2, 101.0, 6],
@@ -724,7 +720,7 @@ provinces.forEach(([val,label])=>{
   provSelect.appendChild(opt);
 });
 
-// เริ่มต้นแผนที่ (ใช้ Google Maps ภาษาไทย ที่มีชื่ออำเภอ ตำบล ถนน สถานที่สำคัญครบถ้วน)
+// แผนที่ Google Maps ภาษาไทย (แสดงชื่ออำเภอ ตำบล ถนน สถานที่สำคัญครบถ้วน)
 const map = L.map('map', { zoomControl:true, attributionControl:false }).setView([13.2, 101.0], 6);
 
 let googleNormalLayer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&hl=th&gl=TH&x={x}&y={y}&z={z}', {
@@ -857,12 +853,17 @@ function compressImageFile(file) {
   });
 }
 
-// โหลดข้อมูลหมุดจริงของคุณจาก Firebase
+// 🎯 โหลดเฉพาะหมุดที่คุณสร้างขึ้นจริงจาก Firebase (ข้ามหมุดจำลองเดิมทั้งหมด)
 async function loadFromFirebase(){
   try {
     const snapshot = await db.collection('places').get();
     snapshot.forEach(doc => {
+      // ดักทิ้งหมุดจำลองเดิมทันที ไม่เอาขึ้นแผนที่
+      if (MOCK_IDS.has(doc.id)) return;
+
       const data = doc.data();
+      if (MOCK_TITLES.has(data.title)) return;
+
       let p = places.find(x => x.id === doc.id);
       
       let photosArr = [];
@@ -881,6 +882,7 @@ async function loadFromFirebase(){
         places.push(p);
       }
     });
+
     places.forEach(renderMarker);
     refreshCategoryOptions();
     checkUrlForPlace();
@@ -889,7 +891,6 @@ async function loadFromFirebase(){
   }
 }
 
-places.forEach(renderMarker);
 loadFromFirebase();
 
 const filtersEl = document.getElementById('filters');
@@ -922,7 +923,8 @@ provSelect.addEventListener('change', (e)=>{
   if(val === 'ratchaburi'){
     if(!map.hasLayer(maskLayer)) maskLayer.addTo(map);
     if(!map.hasLayer(outlineLayer)) outlineLayer.addTo(map);
-    setTimeout(()=> openSheet('godeng_bansing'), 1200);
+    const bsPlace = places.find(x=>x.id==='godeng_bansing' || x.title.includes('โกเด้ง'));
+    if(bsPlace) setTimeout(()=> openSheet(bsPlace.id), 1200);
   } else {
     if(map.hasLayer(maskLayer)) map.removeLayer(maskLayer);
     if(map.hasLayer(outlineLayer)) map.removeLayer(outlineLayer);
@@ -944,11 +946,13 @@ document.querySelectorAll('.chip').forEach(chip=>{
 function applyFilters(){
   const catFilter = catSelect.value;
   places.forEach(p=>{
-    const passesTags = [...activeFilters].every(k => p.tags[k] === true);
+    const passesTags = [...activeFilters].every(k => p.tags && p.tags[k] === true);
     const passesCat = !catFilter || p.category === catFilter;
     const m = markers[p.id];
-    if(passesTags && passesCat){ if(!map.hasLayer(m)) m.addTo(map); }
-    else { if(map.hasLayer(m)) map.removeLayer(m); if(currentId===p.id) closeSheet(); }
+    if(m) {
+      if(passesTags && passesCat){ if(!map.hasLayer(m)) m.addTo(map); }
+      else { if(map.hasLayer(m)) map.removeLayer(m); if(currentId===p.id) closeSheet(); }
+    }
   });
 }
 
@@ -986,15 +990,15 @@ function openSheet(id){
   if(!p) return;
   currentId = id;
   document.getElementById('sheetTitle').textContent = p.title;
-  document.getElementById('sheetCat').textContent = p.category || '';
-  document.getElementById('sheetDesc').textContent = p.desc;
+  document.getElementById('sheetCat').textContent = p.category || 'ทั่วไป';
+  document.getElementById('sheetDesc').textContent = p.desc || 'ไม่มีคำอธิบาย';
   
   renderSheetGallery(p);
 
   const statusEl = document.getElementById('sheetStatus');
-  statusEl.className = 'status-badge ' + p.status;
+  statusEl.className = 'status-badge ' + (p.status || 'unverified');
   statusEl.textContent = p.status==='verified' ? '✓ ชุมชนยืนยันแล้ว' : p.status==='disputed' ? '⚠ มีการแจ้งข้อมูลคลาดเคลื่อน/ชำรุด' : '• รอการยืนยัน';
-  document.getElementById('sheetVotes').textContent = `ยืนยันแล้ว ${p.votes} คน`;
+  document.getElementById('sheetVotes').textContent = `ยืนยันแล้ว ${p.votes || 0} คน`;
   renderPills(p);
   
   updateNavLinks(p);
@@ -1014,13 +1018,36 @@ function openSheet(id){
 function renderPills(p){
   const pillRow = document.getElementById('sheetPills');
   pillRow.innerHTML = '';
-  const active = Object.entries(TAG_LABELS).filter(([k])=>p.tags[k]);
+  const active = p.tags ? Object.entries(TAG_LABELS).filter(([k])=>p.tags[k]) : [];
   if(!active.length){ pillRow.innerHTML = '<span class="pill-empty">ยังไม่มีข้อมูลการเข้าถึง — ช่วยเติมข้อมูลด้านล่างได้เลย</span>'; return; }
   active.forEach(([k,label])=>{ const s=document.createElement('span'); s.className='pill'; s.innerHTML = ICONS[TAG_ICON_KEY[k]] + `<span>${label}</span>`; pillRow.appendChild(s); });
 }
 
 function closeSheet(){ sheet.classList.remove('open'); currentId=null; }
 document.getElementById('sheetClose').addEventListener('click', closeSheet);
+
+// 🗑️ ปุ่มลบหมุดนี้ออกจากระบบถาวร (ลบจาก Firebase ทันที)
+document.getElementById('btnDeletePlace').addEventListener('click', async () => {
+  if (!currentId) return;
+  const p = places.find(x => x.id === currentId);
+  if (!confirm(`ยืนยันการลบหมุด "${p.title}" ออกจากระบบถาวร?`)) return;
+
+  showToast('กำลังลบหมุด...');
+  try {
+    await db.collection('places').doc(p.id).delete();
+    if (markers[p.id]) {
+      map.removeLayer(markers[p.id]);
+      delete markers[p.id];
+    }
+    places = places.filter(x => x.id !== p.id);
+    closeSheet();
+    refreshCategoryOptions();
+    showToast('🗑️ ลบหมุดออกจากระบบเรียบร้อยแล้ว');
+  } catch(err) {
+    console.error(err);
+    showToast('ลบไม่สำเร็จ ตรวจสอบสิทธิ์ Firebase');
+  }
+});
 
 // ----------------------------------------------------
 // 🌟 จัดการรูปถ่ายสถานที่
@@ -1364,7 +1391,7 @@ document.getElementById('btnOnlineSearch').addEventListener('click', async () =>
 async function verify(id){
   if(verifiedByMe.has(id)) return;
   const p = places.find(x=>x.id===id);
-  p.votes += 1;
+  p.votes = (p.votes || 0) + 1;
   verifiedByMe.add(id);
   if(p.status==='unverified') p.status='verified';
   
@@ -1383,7 +1410,8 @@ function renderEditTags(p){
   Object.entries(TAG_LABELS).forEach(([key,label])=>{
     const lab = document.createElement('label');
     lab.className = 'tag-check';
-    lab.innerHTML = `<input type="checkbox" data-key="${key}" ${p.tags[key]?'checked':''}>` + ICONS[TAG_ICON_KEY[key]] + `<span>${label}</span>`;
+    const isChecked = p.tags && p.tags[key] ? 'checked' : '';
+    lab.innerHTML = `<input type="checkbox" data-key="${key}" ${isChecked}>` + ICONS[TAG_ICON_KEY[key]] + `<span>${label}</span>`;
     grid.appendChild(lab);
   });
 }
@@ -1391,6 +1419,7 @@ function renderEditTags(p){
 document.getElementById('btnSaveTags').addEventListener('click', async ()=>{
   if(!currentId) return;
   const p = places.find(x=>x.id===currentId);
+  if(!p.tags) p.tags = {};
   document.querySelectorAll('#editTagGrid input').forEach(cb=>{ p.tags[cb.dataset.key] = cb.checked; });
   
   try {
