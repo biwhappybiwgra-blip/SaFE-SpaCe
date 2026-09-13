@@ -6,11 +6,11 @@
 <title>SaFE SpaCe — แผนที่การเข้าถึงและพื้นที่ปลอดภัย</title>
 <link rel="icon" type="image/png" href="logomap.png">
 
-<!-- 1. ดึง Leaflet CSS (จุดสำคัญที่เคยหายไป) -->
+<!-- Leaflet CSS & JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 
-<!-- นำเข้า Firebase SDK -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
 
@@ -18,13 +18,28 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-1:#F9F8F6; --bg-2:#F3EFEA;
-    --sage:#6A8E72; --sage-dark:#557260;
-    --terracotta:#C87D55; --terracotta-dark:#B06A44;
-    --ink:#2C3531; --rust:#B84A39;
-    --pin-unverified:#B7B2A8;
-    --radius:18px; --shadow: 0 8px 24px rgba(44,53,49,0.12);
+    /* โทนสี Earth Tone: เขียว • น้ำตาล • เหลืองอ่อน */
+    --bg-1: #FAF7F2;            /* ครีมนวล / งาช้าง */
+    --bg-2: #F3ECE1;            /* ทรายนวล / ครีมเข้ม */
+    --yellow-soft: #F9F2DC;     /* เหลืองอ่อนละมุนตา */
+    --yellow-border: #E8DDCA;   /* สีขอบเหลืองนวล */
+    
+    --sage: #4D704C;            /* เขียวใบไม้สงบ สบายตา */
+    --sage-dark: #3B573A;
+    --sage-light: #E8F0E7;       /* เขียวพาสเทลอ่อนสำหรับพื้นหลัง Badge */
+
+    --brown: #7A4F28;           /* น้ำตาลไม้อบอุ่น */
+    --brown-dark: #5C3A1C;
+    
+    --ink: #332822;             /* น้ำตาลเข้มกาแฟ อ่านง่าย สบายตากว่าดำสนิท */
+    --ink-subtle: #7A7067;      /* สีข้อความรอง */
+    --rust: #B24C3D;            /* ส้มอิฐเตือนภัย */
+    --pin-unverified: #A89F91;  /* น้ำตาลอมเทา */
+    
+    --radius: 18px;
+    --shadow: 0 8px 24px rgba(51, 40, 34, 0.08);
   }
+
   *{box-sizing:border-box;}
   html,body{height:100%;margin:0;}
   body{ font-family:'Sarabun', sans-serif; background:var(--bg-1); color:var(--ink); overflow:hidden; }
@@ -32,92 +47,109 @@
   svg.ic{ width:16px; height:16px; flex:0 0 auto; }
 
   header{ position:absolute; top:0; left:0; right:0; z-index:1000; padding:14px 16px 10px;
-    background:linear-gradient(180deg, rgba(249,248,246,0.97) 65%, rgba(249,248,246,0)); pointer-events:none; }
+    background:linear-gradient(180deg, rgba(250,247,242,0.96) 65%, rgba(250,247,242,0)); pointer-events:none; }
   header > *{ pointer-events:auto; }
   .top-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
   .brand{ display:flex; align-items:center; gap:8px; font-family:'Mali', sans-serif; font-weight:700; font-size:21px; color:var(--ink); }
-  .brand .dot{ width:11px;height:11px;border-radius:50%; background:var(--sage); box-shadow:0 0 0 4px rgba(106,142,114,0.18); }
+  .brand .dot{ width:11px;height:11px;border-radius:50%; background:var(--sage); box-shadow:0 0 0 4px rgba(77,112,76,0.2); }
   .select-group{ display:flex; gap:8px; flex-wrap:wrap; }
+  
   select{ font-family:'Sarabun',sans-serif; font-size:13.5px; font-weight:600; color:var(--ink); background:#fff;
-    border:1px solid rgba(44,53,49,0.12); border-radius:999px; padding:9px 16px; box-shadow:var(--shadow);
+    border:1px solid var(--yellow-border); border-radius:999px; padding:9px 16px; box-shadow:var(--shadow);
     cursor:pointer; appearance:none; min-height:44px;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%232C3531'/%3E%3C/svg%3E");
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237A4F28'/%3E%3C/svg%3E");
     background-repeat:no-repeat; background-position:right 14px center; padding-right:32px; max-width:180px; }
-  select:focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
-  #locateBtn{ font-family:'Sarabun',sans-serif; font-size:13.5px; font-weight:700; color:#fff; background:var(--terracotta);
+  select:focus-visible{ outline:2px solid var(--brown); outline-offset:2px; }
+
+  #locateBtn{ font-family:'Sarabun',sans-serif; font-size:13.5px; font-weight:700; color:#fff; background:var(--brown);
     border:none; border-radius:999px; padding:9px 16px; min-height:44px; box-shadow:var(--shadow); cursor:pointer;
-    display:flex; align-items:center; gap:6px; }
+    display:flex; align-items:center; gap:6px; transition:all 0.15s ease; }
   #locateBtn svg{ fill:#fff; }
-  #locateBtn:hover{ filter:brightness(1.05); }
+  #locateBtn:hover{ background:var(--brown-dark); filter:brightness(1.05); }
+
   .filters{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
   .filters::-webkit-scrollbar{display:none;}
+  
+  /* ฟิลเตอร์ชิปโทนเหลืองอ่อน สบายตา */
   .chip{ flex:0 0 auto; display:flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600; color:var(--ink);
-    background:#fff; border:1px solid rgba(44,53,49,0.14); border-radius:999px; padding:9px 14px; min-height:44px;
-    cursor:pointer; user-select:none; box-shadow:0 2px 8px rgba(44,53,49,0.07);
-    transition:background .15s ease, border-color .15s ease, color .15s ease; }
-  .chip svg{ fill:var(--ink); }
+    background:var(--yellow-soft); border:1px solid var(--yellow-border); border-radius:999px; padding:9px 14px; min-height:44px;
+    cursor:pointer; user-select:none; box-shadow:0 2px 8px rgba(51,40,34,0.06);
+    transition:all .15s ease; }
+  .chip svg{ fill:var(--brown); }
   .chip.active{ background:var(--sage); border-color:var(--sage); color:#fff; }
   .chip.active svg{ fill:#fff; }
-  .chip:focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
+  .chip:focus-visible{ outline:2px solid var(--brown); outline-offset:2px; }
 
-  .pin-wrap{ display:flex; flex-direction:column; align-items:center; filter:drop-shadow(0 3px 5px rgba(44,53,49,0.35)); }
+  .pin-wrap{ display:flex; flex-direction:column; align-items:center; filter:drop-shadow(0 4px 6px rgba(51,40,34,0.3)); }
   .pin-wrap svg{ display:block; }
   .user-dot{ width:16px; height:16px; border-radius:50%; background:#3B82F6; border:3px solid #fff;
     box-shadow:0 0 0 5px rgba(59,130,246,0.28); }
 
-  #sheet{ position:absolute; z-index:1100; background:#fff; box-shadow:var(--shadow); padding:18px 18px 20px;
-    transform:translateY(120%); transition:transform .32s cubic-bezier(.32,.72,0,1); overflow-y:auto; }
+  #sheet{ position:absolute; z-index:1100; background:#fff; box-shadow:var(--shadow); padding:20px;
+    transform:translateY(120%); transition:transform .32s cubic-bezier(.32,.72,0,1); overflow-y:auto;
+    border:1px solid var(--yellow-border); }
   #sheet.open{ transform:translateY(0); }
   #sheet .closeBtn{ position:absolute; top:12px; right:12px; width:34px; height:34px; border-radius:50%;
     border:none; background:var(--bg-2); color:var(--ink); font-size:16px; cursor:pointer;
     display:flex; align-items:center; justify-content:center; }
+  
   .status-badge{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700;
-    padding:5px 11px; border-radius:999px; margin-bottom:10px; }
-  .status-badge.verified{ background:rgba(106,142,114,0.15); color:var(--sage-dark); }
-  .status-badge.unverified{ background:rgba(183,178,168,0.25); color:#6b665c; }
-  .status-badge.disputed{ background:rgba(184,74,57,0.13); color:var(--rust); }
-  #sheet h2{ font-family:'Mali',sans-serif; font-weight:700; font-size:19px; margin:0 0 4px; padding-right:34px; }
-  #sheet .cat{ font-size:12.5px; color:#8a8478; margin-bottom:10px; }
-  #sheet .desc{ font-size:14px; line-height:1.6; color:#514c45; margin-bottom:10px; }
+    padding:5px 12px; border-radius:999px; margin-bottom:10px; }
+  .status-badge.verified{ background:var(--sage-light); color:var(--sage-dark); border:1px solid rgba(77,112,76,0.2); }
+  .status-badge.unverified{ background:var(--bg-2); color:var(--ink-subtle); }
+  .status-badge.disputed{ background:rgba(178,76,61,0.12); color:var(--rust); }
+
+  #sheet h2{ font-family:'Mali',sans-serif; font-weight:700; font-size:19px; margin:0 0 4px; padding-right:34px; color:var(--ink); }
+  #sheet .cat{ font-size:12.5px; color:var(--brown); font-weight:600; margin-bottom:10px; }
+  #sheet .desc{ font-size:14px; line-height:1.6; color:#4F463E; margin-bottom:12px; }
   #sheetPhoto{ width:100%; max-height:150px; object-fit:cover; border-radius:12px; margin-bottom:12px; display:none; }
+  
   .pill-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; min-height:20px; }
-  .pill{ display:flex; align-items:center; gap:5px; font-size:12.5px; font-weight:600; background:var(--bg-2);
-    color:var(--ink); padding:6px 12px; border-radius:999px; }
+  .pill{ display:flex; align-items:center; gap:5px; font-size:12.5px; font-weight:600; background:var(--yellow-soft);
+    border:1px solid var(--yellow-border); color:var(--ink); padding:6px 12px; border-radius:999px; }
   .pill svg{ fill:var(--sage-dark); }
-  .pill-empty{ font-size:12.5px; color:#8a8478; }
-  .votes{ font-size:13px; color:#6b665c; margin:8px 0 14px; }
+  .pill-empty{ font-size:12.5px; color:var(--ink-subtle); }
+  
+  .votes{ font-size:13px; color:var(--ink-subtle); margin:8px 0 14px; }
   .action-row{ display:flex; gap:10px; margin-bottom:16px; }
   .btn{ flex:1; min-height:44px; border-radius:12px; border:none; font-family:'Sarabun',sans-serif; font-weight:700;
     font-size:14.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px;
-    transition:filter .15s ease, transform .1s ease; }
+    transition:all .15s ease; }
   .btn svg{ fill:#fff; }
   .btn:active{ transform:scale(0.97); }
+  
   .btn-verify{ background:var(--sage); color:#fff; }
-  .btn-verify:hover{ filter:brightness(1.06); }
-  .btn-verify:disabled{ background:#e3dfd4; color:#8a8478; cursor:default; }
-  .btn-verify:disabled svg{ fill:#8a8478; }
-  .btn-nav{ background:var(--terracotta); color:#fff; }
-  .btn-nav:hover{ filter:brightness(1.05); }
+  .btn-verify:hover{ background:var(--sage-dark); }
+  .btn-verify:disabled{ background:#E4DDD3; color:#9E9486; cursor:default; }
+  .btn-verify:disabled svg{ fill:#9E9486; }
+  
+  .btn-nav{ background:var(--brown); color:#fff; }
+  .btn-nav:hover{ background:var(--brown-dark); }
 
   .section-title{ font-family:'Mali',sans-serif; font-weight:700; font-size:14.5px; margin:0 0 10px;
-    display:flex; align-items:center; gap:7px; }
-  .section-title svg{ fill:var(--terracotta-dark); }
-  .tag-grid{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:10px; }
-  .tag-check{ display:flex; align-items:center; gap:6px; font-size:13px; background:var(--bg-2);
-    padding:7px 11px; border-radius:999px; cursor:pointer; }
+    display:flex; align-items:center; gap:7px; color:var(--ink); }
+  .section-title svg{ fill:var(--brown); }
+  
+  .tag-grid{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px; }
+  .tag-check{ display:flex; align-items:center; gap:6px; font-size:13px; background:var(--yellow-soft);
+    border:1px solid var(--yellow-border); padding:7px 12px; border-radius:999px; cursor:pointer; }
   .tag-check svg{ fill:var(--sage-dark); }
-  .btn-save-tags{ background:var(--terracotta-dark); color:#fff; width:100%; margin-bottom:18px; }
-  .btn-save-tags:hover{ filter:brightness(1.05); }
+  
+  .btn-save-tags{ background:var(--brown-dark); color:#fff; width:100%; margin-bottom:18px; }
+  .btn-save-tags:hover{ filter:brightness(1.1); }
 
-  .comment-item{ background:var(--bg-2); border-radius:12px; padding:9px 12px; margin-bottom:8px; }
+  .comment-item{ background:var(--bg-1); border:1px solid var(--yellow-border); border-radius:12px; padding:10px 12px; margin-bottom:8px; }
   .comment-item .cname{ font-size:12.5px; font-weight:700; color:var(--sage-dark); }
-  .comment-item .ctext{ font-size:13.5px; margin-top:2px; }
+  .comment-item .ctext{ font-size:13.5px; margin-top:2px; color:var(--ink); }
+  
   .comment-form{ display:flex; gap:8px; margin-top:8px; }
-  .comment-form input[type=text]{ flex:1; min-height:40px; border-radius:10px; border:1px solid rgba(44,53,49,0.15);
-    padding:0 12px; font-family:'Sarabun',sans-serif; font-size:13.5px; }
-  .comment-form button{ min-width:44px; min-height:40px; border-radius:10px; border:none; background:var(--sage);
+  .comment-form input[type=text]{ flex:1; min-height:42px; border-radius:10px; border:1px solid var(--yellow-border);
+    background:#fff; padding:0 12px; font-family:'Sarabun',sans-serif; font-size:13.5px; color:var(--ink); }
+  .comment-form input[type=text]:focus{ outline:2px solid var(--brown); }
+  .comment-form button{ min-width:48px; min-height:42px; border-radius:10px; border:none; background:var(--sage);
     color:#fff; font-weight:700; cursor:pointer; }
-  .no-comments{ font-size:13px; color:#8a8478; margin-bottom:8px; }
+  .comment-form button:hover{ background:var(--sage-dark); }
+  .no-comments{ font-size:13px; color:var(--ink-subtle); margin-bottom:8px; }
 
   @media (max-width:768px){ #sheet{ left:0; right:0; bottom:0; border-radius:22px 22px 0 0; max-height:80vh; } }
   @media (min-width:769px){
@@ -126,47 +158,51 @@
   }
 
   #nearbyPanel{ position:absolute; top:130px; right:18px; z-index:1080; width:290px; max-height:calc(100vh - 160px);
-    background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; overflow-y:auto;
+    background:#fff; border:1px solid var(--yellow-border); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; overflow-y:auto;
     transform:translateX(130%); transition:transform .3s cubic-bezier(.32,.72,0,1); }
   #nearbyPanel.open{ transform:translateX(0); }
-  #nearbyPanel h3{ font-family:'Mali',sans-serif; font-weight:700; font-size:15.5px; margin:0 0 4px; }
-  #nearbyPanel .sub{ font-size:12.5px; color:#8a8478; margin-bottom:12px; }
+  #nearbyPanel h3{ font-family:'Mali',sans-serif; font-weight:700; font-size:15.5px; margin:0 0 4px; color:var(--ink); }
+  #nearbyPanel .sub{ font-size:12.5px; color:var(--ink-subtle); margin-bottom:12px; }
   #nearbyPanel .closeBtn{ position:absolute; top:12px; right:12px; width:30px; height:30px; border-radius:50%;
     border:none; background:var(--bg-2); cursor:pointer; }
   .nearby-item{ display:flex; justify-content:space-between; align-items:center; gap:10px;
     padding:10px 0; border-bottom:1px solid var(--bg-2); cursor:pointer; }
   .nearby-item:last-child{ border-bottom:none; }
-  .nearby-item .ni-name{ font-size:13.5px; font-weight:700; }
-  .nearby-item .ni-cat{ font-size:12px; color:#8a8478; margin-top:2px; }
+  .nearby-item .ni-name{ font-size:13.5px; font-weight:700; color:var(--ink); }
+  .nearby-item .ni-cat{ font-size:12px; color:var(--brown); margin-top:2px; }
   .nearby-item .ni-dist{ font-size:12.5px; font-weight:700; color:var(--sage-dark); white-space:nowrap; }
   @media (max-width:768px){ #nearbyPanel{ left:16px; right:16px; width:auto; top:auto; bottom:16px; max-height:46vh; transform:translateY(130%); }
     #nearbyPanel.open{ transform:translateY(0); } }
 
   #searchFab{ position:absolute; right:18px; bottom:24px; z-index:1090; width:54px; height:54px; border-radius:50%;
-    border:none; background:var(--ink); box-shadow:var(--shadow); cursor:pointer; display:flex; align-items:center;
-    justify-content:center; }
+    border:none; background:var(--brown); box-shadow:0 6px 18px rgba(122,79,40,0.35); cursor:pointer; display:flex; align-items:center;
+    justify-content:center; transition:transform .15s ease; }
+  #searchFab:hover{ transform:scale(1.06); background:var(--brown-dark); }
   #searchFab svg{ fill:none; stroke:#fff; width:22px; height:22px; }
+  
   #searchPanel{ position:absolute; right:18px; bottom:88px; z-index:1090; width:280px; max-height:360px;
-    background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:14px; overflow:hidden;
+    background:#fff; border:1px solid var(--yellow-border); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px; overflow:hidden;
     display:flex; flex-direction:column; transform:translateY(20px) scale(0.95); opacity:0; pointer-events:none;
     transition:transform .2s ease, opacity .2s ease; }
   #searchPanel.open{ transform:translateY(0) scale(1); opacity:1; pointer-events:auto; }
-  #searchPanel input{ width:100%; min-height:42px; border-radius:10px; border:1px solid rgba(44,53,49,0.16);
-    padding:0 12px; font-family:'Sarabun',sans-serif; font-size:14px; margin-bottom:8px; }
+  #searchPanel input{ width:100%; min-height:42px; border-radius:10px; border:1px solid var(--yellow-border);
+    padding:0 12px; font-family:'Sarabun',sans-serif; font-size:14px; margin-bottom:8px; color:var(--ink); }
+  #searchPanel input:focus{ outline:2px solid var(--brown); }
   #searchResults{ overflow-y:auto; }
-  .search-item{ padding:9px 4px; border-bottom:1px solid var(--bg-2); cursor:pointer; font-size:13.5px; font-weight:600; }
+  .search-item{ padding:9px 4px; border-bottom:1px solid var(--bg-2); cursor:pointer; font-size:13.5px; font-weight:600; color:var(--ink); }
   .search-item:last-child{ border-bottom:none; }
-  .search-item .si-cat{ font-size:11.5px; font-weight:400; color:#8a8478; }
-  .search-empty{ font-size:12.5px; color:#8a8478; padding:6px 4px; }
+  .search-item .si-cat{ font-size:11.5px; font-weight:400; color:var(--brown); }
+  .search-empty{ font-size:12.5px; color:var(--ink-subtle); padding:6px 4px; }
   @media (max-width:768px){ #searchPanel{ left:16px; right:16px; width:auto; bottom:88px; } }
 
-  #toast{ position:absolute; bottom:24px; left:50%; transform:translate(-50%,20px); background:var(--ink); color:#fff;
+  #toast{ position:absolute; bottom:24px; left:50%; transform:translate(-50%,20px); background:var(--ink); color:#FAF7F2;
     font-size:13.5px; font-weight:600; padding:11px 18px; border-radius:999px; z-index:1400; opacity:0;
     pointer-events:none; transition:opacity .25s ease, transform .25s ease; box-shadow:var(--shadow); }
   #toast.show{ opacity:1; transform:translate(-50%,0); }
   .leaflet-control-zoom{ margin-top:130px !important; }
 
-  .leaflet-tile{ filter: grayscale(100%) sepia(40%) hue-rotate(60deg) saturate(120%) brightness(1.03); }
+  /* ปรับโทนสีแผ่นที่ให้ออกสีทรายอบอุ่น Earth Tone สบายตา */
+  .leaflet-tile{ filter: sepia(30%) hue-rotate(345deg) saturate(95%) brightness(1.02); }
 </style>
 </head>
 <body>
@@ -181,7 +217,7 @@
       <select id="categorySelect" aria-label="เลือกประเภทร้าน">
         <option value="">ทุกประเภท</option>
       </select>
-      <button id="locateBtn"><svg class="ic" viewBox="0 0 20 20"><path d="M10 18S3 11.8 3 7a7 7 0 1114 0c0 4.8-7 11-7 11z"/><circle cx="10" cy="7" r="2.6" fill="var(--terracotta)"/></svg>ร้านใกล้ฉัน</button>
+      <button id="locateBtn"><svg class="ic" viewBox="0 0 20 20"><path d="M10 18S3 11.8 3 7a7 7 0 1114 0c0 4.8-7 11-7 11z"/><circle cx="10" cy="7" r="2.6" fill="var(--brown)"/></svg>ร้านใกล้ฉัน</button>
     </div>
   </div>
   <div class="filters" id="filters" role="group" aria-label="ตัวกรองการเข้าถึง"></div>
@@ -278,7 +314,7 @@ function categoryGlyph(category){
   }
 }
 
-// ข้อมูลสถานที่ พร้อมเพิ่ม "ร้านโกเด้งเส้นกะสั่ง (บ้านสิงห์)" ตามที่คุณต้องการ
+// ข้อมูลสถานที่
 let places = [
   { 
     id:'godeng_bansing', 
@@ -336,32 +372,31 @@ provinces.forEach(([val,label])=>{
 // เริ่มต้นแผนที่
 const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([13.2, 101.0], 6);
 
-// เลเยอร์แผนที่พร้อมระบบสำรองหาก MapTiler ล่ม
+// แผนที่หลัก พร้อมตัวสลับอัตโนมัติหาก MapTiler ติดขัด
 const baseLayer = L.tileLayer('https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=heBoKGgYEE6tSt7eXYza', {
   maxZoom: 19, attribution: '&copy; MapTiler &copy; OpenStreetMap', crossOrigin: true, updateWhenIdle: true
 }).addTo(map);
 
 baseLayer.on('tileerror', (e)=>{
-  // หาก MapTiler มีปัญหา ให้ดึงจาก OpenStreetMap โดยตรงแทน
   e.tile.src = `https://tile.openstreetmap.org/${e.coords.z}/${e.coords.x}/${e.coords.y}.png`;
 });
 
-// กรอบขอบเขตจังหวัดราชบุรี (แก้เงาคลุมให้ครอบคลุมรอบโลก ไม่ตัดกรอบสี่เหลี่ยม)
 const ratchaburiOutline = [
   [13.90,99.75],[13.85,99.95],[13.70,100.05],[13.45,100.05],[13.20,99.95],
   [13.05,99.75],[13.05,99.45],[13.20,99.15],[13.45,99.05],[13.65,99.05],
   [13.85,99.20],[13.95,99.50]
 ];
 const worldBigBox = [[-85,-180],[-85,180],[85,180],[85,-180]];
-const maskLayer = L.polygon([worldBigBox, ratchaburiOutline], { stroke:false, fillColor:'#2C3531', fillOpacity:0.45, interactive:false });
-const outlineLayer = L.polygon(ratchaburiOutline, { color:'#F3EFEA', weight:2.5, fill:false, interactive:false });
+const maskLayer = L.polygon([worldBigBox, ratchaburiOutline], { stroke:false, fillColor:'#332822', fillOpacity:0.38, interactive:false });
+const outlineLayer = L.polygon(ratchaburiOutline, { color:'#E8DDCA', weight:2.5, fill:false, interactive:false });
 
 const markers = {};
 function pinIcon(status, category){
-  const fill = status==='verified' ? '#6A8E72' : status==='disputed' ? '#B84A39' : '#B7B2A8';
+  // หมุดสี Earth Tone: เขียวธรรมชาติ / ส้มอิฐ / น้ำตาลเทา
+  const fill = status==='verified' ? '#4D704C' : status==='disputed' ? '#B24C3D' : '#A89F91';
   const glyph = categoryGlyph(category);
   const svg = `<svg width="30" height="38" viewBox="0 0 30 38" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="15" cy="15" r="13" fill="${fill}" stroke="#fff" stroke-width="2.5"/>
+    <circle cx="15" cy="15" r="13" fill="${fill}" stroke="#FAF7F2" stroke-width="2.5"/>
     <path d="M15 37 L9 21 L21 21 Z" fill="${fill}"/>
     ${glyph}
   </svg>`;
@@ -428,7 +463,6 @@ provSelect.addEventListener('change', (e)=>{
   if(val === 'ratchaburi'){
     if(!map.hasLayer(maskLayer)) maskLayer.addTo(map);
     if(!map.hasLayer(outlineLayer)) outlineLayer.addTo(map);
-    // เปิดข้อมูลร้านโกเด้งเส้นกะสั่งให้อัตโนมัติเมื่อเลือกราชบุรี
     setTimeout(()=> openSheet('godeng_bansing'), 1200);
   } else {
     if(map.hasLayer(maskLayer)) map.removeLayer(maskLayer);
@@ -505,7 +539,6 @@ function closeSheet(){ sheet.classList.remove('open'); currentId=null; }
 document.getElementById('sheetClose').addEventListener('click', closeSheet);
 map.on('click', closeSheet);
 
-// ยืนยันข้อมูล + อัปเดตลง Firebase
 async function verify(id){
   if(verifiedByMe.has(id)) return;
   const p = places.find(x=>x.id===id);
@@ -538,7 +571,6 @@ function renderEditTags(p){
   });
 }
 
-// บันทึก Tags ลง Firebase
 document.getElementById('btnSaveTags').addEventListener('click', async ()=>{
   if(!currentId) return;
   const p = places.find(x=>x.id===currentId);
@@ -574,7 +606,6 @@ function renderComments(p){
   }
 }
 
-// บันทึกความคิดเห็นลง Firebase
 document.getElementById('commentSend').addEventListener('click', async ()=>{
   const input = document.getElementById('commentInput');
   const text = input.value.trim();
@@ -672,7 +703,7 @@ function showToast(msg){
   setTimeout(()=> t.classList.remove('show'), 2200);
 }
 
-// สั่งคำนวณแผนที่ใหม่ทันทีที่โหลดเสร็จ ป้องกันแผนที่แหว่ง
+// สั่งคำนวณแผนที่ใหม่ทันทีที่โหลดเสร็จ
 window.addEventListener('load', () => {
   setTimeout(() => { map.invalidateSize(); }, 300);
 });
