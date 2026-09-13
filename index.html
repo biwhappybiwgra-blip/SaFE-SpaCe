@@ -6,11 +6,11 @@
 <title>SaFE SpaCe — แผนที่การเข้าถึงและพื้นที่ปลอดภัย</title>
 <link rel="icon" type="image/png" href="logomap.png">
 
-<!-- Leaflet CSS & JS (ต้องมีบรรทัดนี้เพื่อให้หมุดและปุ่มไม่เบี้ยว) -->
+<!-- Leaflet CSS & JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 
-<!-- นำเข้า Firebase SDK -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
 
@@ -18,25 +18,28 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* โทนสี Earth Tone: เขียว • น้ำตาล • เหลืองอ่อน สบายตา */
-    --bg-1: #FAF7F0;             /* พื้นหลังครีมสว่างนวลตา */
-    --bg-2: #F3EDE2;             /* สีทรายนวล / ครีมเข้ม */
-    --yellow-soft: #FDF8EC;      /* เหลืองเนยอ่อนละมุนตา */
-    --yellow-border: #E8DECD;    /* ขอบเหลืองครีมบางเบา */
+    /* โทนสี Earth Tone: เขียว • น้ำตาล • เหลืองอ่อน */
+    --bg-1: #FAF7F2;            /* ครีมนวล / งาช้าง */
+    --bg-2: #F3ECE1;            /* ทรายนวล / ครีมเข้ม */
+    --yellow-soft: #F9F2DC;     /* เหลืองอ่อนละมุนตา */
+    --yellow-border: #E8DDCA;   /* สีขอบเหลืองนวล */
+    
+    --sage: #4D704C;            /* เขียวใบไม้สงบ สบายตา */
+    --sage-dark: #3B573A;
+    --sage-light: #E8F0E7;       /* เขียวพาสเทลอ่อนสำหรับพื้นหลัง Badge */
 
-    --sage: #4E7055;             /* เขียวใบไม้สงบ สบายตา */
-    --sage-dark: #3C5742;
-    --sage-light: #E9F1EA;       /* เขียวอ่อนสำหรับ Badge */
-
-    --terracotta: #825838;       /* น้ำตาลไม้อบอุ่น นุ่มนวล */
-    --terracotta-dark: #664329;
-
-    --ink: #2E2722;              /* น้ำตาลเข้มเอสเพรสโซ่ คมชัด สบายตากว่าดำสนิท */
-    --rust: #B54F40;             /* ส้มอิฐธรรมชาติ */
-    --pin-unverified: #A9A296;   /* เทาอมน้ำตาล */
+    --brown: #7A4F28;           /* น้ำตาลไม้อบอุ่น */
+    --brown-dark: #5C3A1C;
+    
+    --ink: #332822;             /* น้ำตาลเข้มกาแฟ อ่านง่าย สบายตากว่าดำสนิท */
+    --ink-subtle: #7A7067;      /* สีข้อความรอง */
+    --rust: #B24C3D;            /* ส้มอิฐเตือนภัย */
+    --pin-unverified: #A89F91;  /* น้ำตาลอมเทา */
+    
     --radius: 18px;
-    --shadow: 0 6px 20px rgba(46, 39, 34, 0.08);
+    --shadow: 0 8px 24px rgba(51, 40, 34, 0.08);
   }
+
   *{box-sizing:border-box;}
   html,body{height:100%;margin:0;}
   body{ font-family:'Sarabun', sans-serif; background:var(--bg-1); color:var(--ink); overflow:hidden; }
@@ -44,44 +47,45 @@
   svg.ic{ width:16px; height:16px; flex:0 0 auto; }
 
   header{ position:absolute; top:0; left:0; right:0; z-index:1000; padding:14px 16px 10px;
-    background:linear-gradient(180deg, rgba(250,247,240,0.97) 65%, rgba(250,247,240,0)); pointer-events:none; }
+    background:linear-gradient(180deg, rgba(250,247,242,0.96) 65%, rgba(250,247,242,0)); pointer-events:none; }
   header > *{ pointer-events:auto; }
   .top-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
   .brand{ display:flex; align-items:center; gap:8px; font-family:'Mali', sans-serif; font-weight:700; font-size:21px; color:var(--ink); }
-  .brand .dot{ width:11px;height:11px;border-radius:50%; background:var(--sage); box-shadow:0 0 0 4px rgba(78,112,85,0.2); }
+  .brand .dot{ width:11px;height:11px;border-radius:50%; background:var(--sage); box-shadow:0 0 0 4px rgba(77,112,76,0.2); }
   .select-group{ display:flex; gap:8px; flex-wrap:wrap; }
+  
   select{ font-family:'Sarabun',sans-serif; font-size:13.5px; font-weight:600; color:var(--ink); background:#fff;
     border:1px solid var(--yellow-border); border-radius:999px; padding:9px 16px; box-shadow:var(--shadow);
     cursor:pointer; appearance:none; min-height:44px;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23825838'/%3E%3C/svg%3E");
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237A4F28'/%3E%3C/svg%3E");
     background-repeat:no-repeat; background-position:right 14px center; padding-right:32px; max-width:180px; }
-  select:focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
-  
-  #locateBtn{ font-family:'Sarabun',sans-serif; font-size:13.5px; font-weight:700; color:#fff; background:var(--terracotta);
+  select:focus-visible{ outline:2px solid var(--brown); outline-offset:2px; }
+
+  #locateBtn{ font-family:'Sarabun',sans-serif; font-size:13.5px; font-weight:700; color:#fff; background:var(--brown);
     border:none; border-radius:999px; padding:9px 16px; min-height:44px; box-shadow:var(--shadow); cursor:pointer;
-    display:flex; align-items:center; gap:6px; transition:filter 0.15s ease; }
+    display:flex; align-items:center; gap:6px; transition:all 0.15s ease; }
   #locateBtn svg{ fill:#fff; }
-  #locateBtn:hover{ filter:brightness(1.08); background:var(--terracotta-dark); }
+  #locateBtn:hover{ background:var(--brown-dark); filter:brightness(1.05); }
 
   .filters{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
   .filters::-webkit-scrollbar{display:none;}
   
-  /* ตัวกรองชิป: สีเหลืองอ่อนละมุนตา เมื่อกดจะเป็นสีเขียว */
+  /* ฟิลเตอร์ชิปโทนเหลืองอ่อน สบายตา */
   .chip{ flex:0 0 auto; display:flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600; color:var(--ink);
     background:var(--yellow-soft); border:1px solid var(--yellow-border); border-radius:999px; padding:9px 14px; min-height:44px;
-    cursor:pointer; user-select:none; box-shadow:0 2px 8px rgba(46,39,34,0.06);
-    transition:background .15s ease, border-color .15s ease, color .15s ease; }
-  .chip svg{ fill:var(--terracotta); }
+    cursor:pointer; user-select:none; box-shadow:0 2px 8px rgba(51,40,34,0.06);
+    transition:all .15s ease; }
+  .chip svg{ fill:var(--brown); }
   .chip.active{ background:var(--sage); border-color:var(--sage); color:#fff; }
   .chip.active svg{ fill:#fff; }
-  .chip:focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
+  .chip:focus-visible{ outline:2px solid var(--brown); outline-offset:2px; }
 
-  .pin-wrap{ display:flex; flex-direction:column; align-items:center; filter:drop-shadow(0 3px 6px rgba(46,39,34,0.3)); }
+  .pin-wrap{ display:flex; flex-direction:column; align-items:center; filter:drop-shadow(0 4px 6px rgba(51,40,34,0.3)); }
   .pin-wrap svg{ display:block; }
   .user-dot{ width:16px; height:16px; border-radius:50%; background:#3B82F6; border:3px solid #fff;
     box-shadow:0 0 0 5px rgba(59,130,246,0.28); }
 
-  #sheet{ position:absolute; z-index:1100; background:#fff; box-shadow:var(--shadow); padding:18px 18px 20px;
+  #sheet{ position:absolute; z-index:1100; background:#fff; box-shadow:var(--shadow); padding:20px;
     transform:translateY(120%); transition:transform .32s cubic-bezier(.32,.72,0,1); overflow-y:auto;
     border:1px solid var(--yellow-border); }
   #sheet.open{ transform:translateY(0); }
@@ -90,59 +94,62 @@
     display:flex; align-items:center; justify-content:center; }
   
   .status-badge{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700;
-    padding:5px 11px; border-radius:999px; margin-bottom:10px; }
-  .status-badge.verified{ background:var(--sage-light); color:var(--sage-dark); }
-  .status-badge.unverified{ background:var(--bg-2); color:#7A7067; }
-  .status-badge.disputed{ background:rgba(181,79,64,0.12); color:var(--rust); }
+    padding:5px 12px; border-radius:999px; margin-bottom:10px; }
+  .status-badge.verified{ background:var(--sage-light); color:var(--sage-dark); border:1px solid rgba(77,112,76,0.2); }
+  .status-badge.unverified{ background:var(--bg-2); color:var(--ink-subtle); }
+  .status-badge.disputed{ background:rgba(178,76,61,0.12); color:var(--rust); }
 
   #sheet h2{ font-family:'Mali',sans-serif; font-weight:700; font-size:19px; margin:0 0 4px; padding-right:34px; color:var(--ink); }
-  #sheet .cat{ font-size:12.5px; color:var(--terracotta); font-weight:600; margin-bottom:10px; }
-  #sheet .desc{ font-size:14px; line-height:1.6; color:#4F463E; margin-bottom:10px; }
+  #sheet .cat{ font-size:12.5px; color:var(--brown); font-weight:600; margin-bottom:10px; }
+  #sheet .desc{ font-size:14px; line-height:1.6; color:#4F463E; margin-bottom:12px; }
   #sheetPhoto{ width:100%; max-height:150px; object-fit:cover; border-radius:12px; margin-bottom:12px; display:none; }
   
   .pill-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; min-height:20px; }
   .pill{ display:flex; align-items:center; gap:5px; font-size:12.5px; font-weight:600; background:var(--yellow-soft);
     border:1px solid var(--yellow-border); color:var(--ink); padding:6px 12px; border-radius:999px; }
   .pill svg{ fill:var(--sage-dark); }
-  .pill-empty{ font-size:12.5px; color:#8A8478; }
+  .pill-empty{ font-size:12.5px; color:var(--ink-subtle); }
   
-  .votes{ font-size:13px; color:#7A7067; margin:8px 0 14px; }
+  .votes{ font-size:13px; color:var(--ink-subtle); margin:8px 0 14px; }
   .action-row{ display:flex; gap:10px; margin-bottom:16px; }
   .btn{ flex:1; min-height:44px; border-radius:12px; border:none; font-family:'Sarabun',sans-serif; font-weight:700;
     font-size:14.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px;
-    transition:filter .15s ease, transform .1s ease; }
+    transition:all .15s ease; }
   .btn svg{ fill:#fff; }
   .btn:active{ transform:scale(0.97); }
+  
   .btn-verify{ background:var(--sage); color:#fff; }
-  .btn-verify:hover{ filter:brightness(1.06); }
+  .btn-verify:hover{ background:var(--sage-dark); }
   .btn-verify:disabled{ background:#E4DDD3; color:#9E9486; cursor:default; }
   .btn-verify:disabled svg{ fill:#9E9486; }
-  .btn-nav{ background:var(--terracotta); color:#fff; }
-  .btn-nav:hover{ filter:brightness(1.05); }
+  
+  .btn-nav{ background:var(--brown); color:#fff; }
+  .btn-nav:hover{ background:var(--brown-dark); }
 
   .section-title{ font-family:'Mali',sans-serif; font-weight:700; font-size:14.5px; margin:0 0 10px;
     display:flex; align-items:center; gap:7px; color:var(--ink); }
-  .section-title svg{ fill:var(--terracotta); }
+  .section-title svg{ fill:var(--brown); }
   
-  .tag-grid{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:10px; }
+  .tag-grid{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px; }
   .tag-check{ display:flex; align-items:center; gap:6px; font-size:13px; background:var(--yellow-soft);
-    border:1px solid var(--yellow-border); padding:7px 11px; border-radius:999px; cursor:pointer; }
+    border:1px solid var(--yellow-border); padding:7px 12px; border-radius:999px; cursor:pointer; }
   .tag-check svg{ fill:var(--sage-dark); }
   
-  .btn-save-tags{ background:var(--terracotta-dark); color:#fff; width:100%; margin-bottom:18px; }
-  .btn-save-tags:hover{ filter:brightness(1.05); }
+  .btn-save-tags{ background:var(--brown-dark); color:#fff; width:100%; margin-bottom:18px; }
+  .btn-save-tags:hover{ filter:brightness(1.1); }
 
-  .comment-item{ background:var(--bg-1); border:1px solid var(--yellow-border); border-radius:12px; padding:9px 12px; margin-bottom:8px; }
+  .comment-item{ background:var(--bg-1); border:1px solid var(--yellow-border); border-radius:12px; padding:10px 12px; margin-bottom:8px; }
   .comment-item .cname{ font-size:12.5px; font-weight:700; color:var(--sage-dark); }
   .comment-item .ctext{ font-size:13.5px; margin-top:2px; color:var(--ink); }
   
   .comment-form{ display:flex; gap:8px; margin-top:8px; }
-  .comment-form input[type=text]{ flex:1; min-height:40px; border-radius:10px; border:1px solid var(--yellow-border);
-    padding:0 12px; font-family:'Sarabun',sans-serif; font-size:13.5px; color:var(--ink); }
-  .comment-form input[type=text]:focus{ outline:2px solid var(--terracotta); }
-  .comment-form button{ min-width:44px; min-height:40px; border-radius:10px; border:none; background:var(--sage);
+  .comment-form input[type=text]{ flex:1; min-height:42px; border-radius:10px; border:1px solid var(--yellow-border);
+    background:#fff; padding:0 12px; font-family:'Sarabun',sans-serif; font-size:13.5px; color:var(--ink); }
+  .comment-form input[type=text]:focus{ outline:2px solid var(--brown); }
+  .comment-form button{ min-width:48px; min-height:42px; border-radius:10px; border:none; background:var(--sage);
     color:#fff; font-weight:700; cursor:pointer; }
-  .no-comments{ font-size:13px; color:#8A8478; margin-bottom:8px; }
+  .comment-form button:hover{ background:var(--sage-dark); }
+  .no-comments{ font-size:13px; color:var(--ink-subtle); margin-bottom:8px; }
 
   @media (max-width:768px){ #sheet{ left:0; right:0; bottom:0; border-radius:22px 22px 0 0; max-height:80vh; } }
   @media (min-width:769px){
@@ -155,22 +162,24 @@
     transform:translateX(130%); transition:transform .3s cubic-bezier(.32,.72,0,1); }
   #nearbyPanel.open{ transform:translateX(0); }
   #nearbyPanel h3{ font-family:'Mali',sans-serif; font-weight:700; font-size:15.5px; margin:0 0 4px; color:var(--ink); }
-  #nearbyPanel .sub{ font-size:12.5px; color:#7A7067; margin-bottom:12px; }
+  #nearbyPanel .sub{ font-size:12.5px; color:var(--ink-subtle); margin-bottom:12px; }
   #nearbyPanel .closeBtn{ position:absolute; top:12px; right:12px; width:30px; height:30px; border-radius:50%;
     border:none; background:var(--bg-2); cursor:pointer; }
   .nearby-item{ display:flex; justify-content:space-between; align-items:center; gap:10px;
     padding:10px 0; border-bottom:1px solid var(--bg-2); cursor:pointer; }
   .nearby-item:last-child{ border-bottom:none; }
   .nearby-item .ni-name{ font-size:13.5px; font-weight:700; color:var(--ink); }
-  .nearby-item .ni-cat{ font-size:12px; color:var(--terracotta); margin-top:2px; }
+  .nearby-item .ni-cat{ font-size:12px; color:var(--brown); margin-top:2px; }
   .nearby-item .ni-dist{ font-size:12.5px; font-weight:700; color:var(--sage-dark); white-space:nowrap; }
   @media (max-width:768px){ #nearbyPanel{ left:16px; right:16px; width:auto; top:auto; bottom:16px; max-height:46vh; transform:translateY(130%); }
     #nearbyPanel.open{ transform:translateY(0); } }
 
   #searchFab{ position:absolute; right:18px; bottom:24px; z-index:1090; width:54px; height:54px; border-radius:50%;
-    border:none; background:var(--terracotta); box-shadow:0 4px 16px rgba(130,88,56,0.35); cursor:pointer; display:flex; align-items:center;
-    justify-content:center; }
+    border:none; background:var(--brown); box-shadow:0 6px 18px rgba(122,79,40,0.35); cursor:pointer; display:flex; align-items:center;
+    justify-content:center; transition:transform .15s ease; }
+  #searchFab:hover{ transform:scale(1.06); background:var(--brown-dark); }
   #searchFab svg{ fill:none; stroke:#fff; width:22px; height:22px; }
+  
   #searchPanel{ position:absolute; right:18px; bottom:88px; z-index:1090; width:280px; max-height:360px;
     background:#fff; border:1px solid var(--yellow-border); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px; overflow:hidden;
     display:flex; flex-direction:column; transform:translateY(20px) scale(0.95); opacity:0; pointer-events:none;
@@ -178,22 +187,22 @@
   #searchPanel.open{ transform:translateY(0) scale(1); opacity:1; pointer-events:auto; }
   #searchPanel input{ width:100%; min-height:42px; border-radius:10px; border:1px solid var(--yellow-border);
     padding:0 12px; font-family:'Sarabun',sans-serif; font-size:14px; margin-bottom:8px; color:var(--ink); }
-  #searchPanel input:focus{ outline:2px solid var(--terracotta); }
+  #searchPanel input:focus{ outline:2px solid var(--brown); }
   #searchResults{ overflow-y:auto; }
   .search-item{ padding:9px 4px; border-bottom:1px solid var(--bg-2); cursor:pointer; font-size:13.5px; font-weight:600; color:var(--ink); }
   .search-item:last-child{ border-bottom:none; }
-  .search-item .si-cat{ font-size:11.5px; font-weight:400; color:var(--terracotta); }
-  .search-empty{ font-size:12.5px; color:#8A8478; padding:6px 4px; }
+  .search-item .si-cat{ font-size:11.5px; font-weight:400; color:var(--brown); }
+  .search-empty{ font-size:12.5px; color:var(--ink-subtle); padding:6px 4px; }
   @media (max-width:768px){ #searchPanel{ left:16px; right:16px; width:auto; bottom:88px; } }
 
-  #toast{ position:absolute; bottom:24px; left:50%; transform:translate(-50%,20px); background:var(--ink); color:#FAF7F0;
+  #toast{ position:absolute; bottom:24px; left:50%; transform:translate(-50%,20px); background:var(--ink); color:#FAF7F2;
     font-size:13.5px; font-weight:600; padding:11px 18px; border-radius:999px; z-index:1400; opacity:0;
     pointer-events:none; transition:opacity .25s ease, transform .25s ease; box-shadow:var(--shadow); }
   #toast.show{ opacity:1; transform:translate(-50%,0); }
   .leaflet-control-zoom{ margin-top:130px !important; }
 
-  /* แผนที่ MapTiler คมชัดเดิม ปรับโทนอุ่นนุ่มตา (ไม่ติดลายน้ำ และไม่มัว) */
-  .leaflet-tile{ filter: sepia(18%) saturate(92%) brightness(1.02); }
+  /* ปรับโทนสีแผ่นที่ให้ออกสีทรายอบอุ่น Earth Tone สบายตา */
+  .leaflet-tile{ filter: sepia(30%) hue-rotate(345deg) saturate(95%) brightness(1.02); }
 </style>
 </head>
 <body>
@@ -208,7 +217,7 @@
       <select id="categorySelect" aria-label="เลือกประเภทร้าน">
         <option value="">ทุกประเภท</option>
       </select>
-      <button id="locateBtn"><svg class="ic" viewBox="0 0 20 20"><path d="M10 18S3 11.8 3 7a7 7 0 1114 0c0 4.8-7 11-7 11z"/><circle cx="10" cy="7" r="2.6" fill="var(--terracotta)"/></svg>ร้านใกล้ฉัน</button>
+      <button id="locateBtn"><svg class="ic" viewBox="0 0 20 20"><path d="M10 18S3 11.8 3 7a7 7 0 1114 0c0 4.8-7 11-7 11z"/><circle cx="10" cy="7" r="2.6" fill="var(--brown)"/></svg>ร้านใกล้ฉัน</button>
     </div>
   </div>
   <div class="filters" id="filters" role="group" aria-label="ตัวกรองการเข้าถึง"></div>
@@ -299,11 +308,13 @@ function categoryGlyph(category){
     case 'ก๋วยเตี๋ยว': return `<g fill="#fff"><path d="M11 13a4 4 0 008 0z"/><path d="M11 13h8v1a1 1 0 01-1 1h-6a1 1 0 01-1-1z"/><path d="M13.3 7.8c0 1-1 1-1 2M16.7 7.8c0 1-1 1-1 2" stroke="#fff" stroke-width="0.9" fill="none" stroke-linecap="round"/></g>`;
     case 'ของหวาน/ไอศกรีม': return `<g fill="#fff"><circle cx="15" cy="9.3" r="3"/><path d="M12.5 10.7L15 18l2.5-7.3z"/></g>`;
     case 'โรงพยาบาล': return `<g><rect x="10" y="6" width="10" height="10" rx="2" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M15 8.3v5.4M12.3 11h5.4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></g>`;
+    case 'สถานีตำรวจ': return `<path d="M15 6l4 1.5v4c0 3.5-2 6-4 7-2-1-4-3.5-4-7v-4z" fill="#fff"/>`;
+    case 'ร้านซ่อมรถ': return `<path d="M17.8 7.3a3 3 0 00-4-3.6L12 5.5l1.7 1.7-1.4 1.4L10.6 6.9l-1.8 1.8a3 3 0 003.6 4L9 16.1v2.4h2.4l3.4-3.4a3 3 0 004-4l-1.9 1.9-1.7-1.7 1.9-1.9 1.7 1.7z" fill="#fff"/>`;
     default: return '';
   }
 }
 
-// ข้อมูลสถานที่ พร้อมร้าน "โกเด้งเส้นกะสั่ง (บ้านสิงห์)"
+// ข้อมูลสถานที่
 let places = [
   { 
     id:'godeng_bansing', 
@@ -321,13 +332,16 @@ let places = [
   { id:'r1', title:'ครัวคุณต๋อย 1935', lat:13.5363, lng:99.8175, category:'อาหารไทย', desc:'ร้านอาหารไทยชื่อดังติดสถานีรถไฟ อ.เมืองราชบุรี บรรยากาศย้อนยุค', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:true }, status:'verified', votes:8, comments:[] },
   { id:'r2', title:'ตลาดสนามหญ้า', lat:13.5312, lng:99.8121, category:'ตลาด/สตรีทฟู้ด', desc:'แหล่งรวมร้านอาหารอร่อยที่มีชื่อเสียงของ อ.เมืองราชบุรี เปิดตั้งแต่สายจนถึงค่ำ', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
   { id:'r3', title:'เนื้อต้มบ้านสิงห์ เจ๊ติ๋ม', lat:13.5520, lng:99.7800, category:'อาหารไทย', desc:'ร้านเนื้อตุ๋น/เนื้อต้มชื่อดังย่านเขางู ราชบุรี', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r4', title:'ตลาดโต้รุ่งริมแม่น้ำแม่กลอง', lat:13.5378, lng:99.8163, category:'ตลาด/สตรีทฟู้ด', desc:'ตลาดโต้รุ่งริมแม่น้ำแม่กลอง แหล่งรวมของกินยามค่ำคืน', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
-  { id:'r5', title:'ครัวตะนาวศรี Cafe & Eatery', lat:13.5722, lng:99.3128, category:'คาเฟ่', desc:'ร้านอาหาร-คาเฟ่บรรยากาศเรือนกระจกใน อ.สวนผึ้ง', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r6', title:'คาเฟ่จุดแวะพักสวนผึ้ง (โมอาย)', lat:13.5600, lng:99.3200, category:'คาเฟ่', desc:'จุดแวะพักยอดนิยมของสวนผึ้ง เด่นด้วยรูปปั้นโมอาย', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
-  { id:'r7', title:'ครัวม่อนไข่', lat:13.6772, lng:99.8578, category:'อาหารไทย', desc:'ร้านดังของโพธาราม กว่า 20 ปี บรรยากาศอบอุ่น', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r8', title:'ก๋วยเตี๋ยวเนื้อน้ำแดงวัดช่องลม', lat:13.5320, lng:99.8030, category:'ก๋วยเตี๋ยว', desc:'ก๋วยเตี๋ยวเนื้อหน้าวัดช่องลม ต.หน้าเมือง อ.เมืองราชบุรี', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
-  { id:'r11', title:'เด่นไทยไอศกรีม', lat:13.5312, lng:99.8121, category:'ของหวาน/ไอศกรีม', desc:'ร้านไอศกรีมชื่อดัง ตลาดสนามหญ้า อ.เมืองราชบุรี', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
-  { id:'r13', title:'โรงพยาบาลราชบุรี', lat:13.5375, lng:99.8155, category:'โรงพยาบาล', desc:'โรงพยาบาลศูนย์ประจำจังหวัด ถ.สมบูรณ์กุล ต.หน้าเมือง', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:true, wide_door:true, has_night_lighting:true }, status:'verified', votes:20, comments:[] }
+  { id:'r4', title:'ตลาดโต้รุ่งริมแม่น้ำแม่กลอง', lat:13.5378, lng:99.8163, category:'ตลาด/สตรีทฟู้ด', desc:'ตลาดโต้รุ่งริมแม่น้ำแม่กลอง แหล่งรวมของกินยามค่ำคืน เช่น ปังก้อนทอง ข้าวต้มซุ่ยฮ้อเฮียโต', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
+  { id:'r5', title:'ครัวตะนาวศรี Cafe & Eatery', lat:13.5722, lng:99.3128, category:'คาเฟ่', desc:'ร้านอาหาร-คาเฟ่บรรยากาศเรือนกระจกใน อ.สวนผึ้ง เมนูเด็ดไข่เจียวกากหมู ไก่ตะนาวศรี', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
+  { id:'r6', title:'คาเฟ่จุดแวะพักสวนผึ้ง (โมอาย)', lat:13.5600, lng:99.3200, category:'คาเฟ่', desc:'จุดแวะพักยอดนิยมของสวนผึ้ง มองเห็นวิวทั้งขาไปขากลับ เด่นด้วยรูปปั้นโมอาย', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
+  { id:'r7', title:'ครัวม่อนไข่', lat:13.6772, lng:99.8578, category:'อาหารไทย', desc:'ร้านดังของโพธาราม กว่า 20 ปี วัตถุดิบคัดสรรอย่างข้าวและผักกูด บรรยากาศเหมือนอยู่บนภูเขา', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
+  { id:'r8', title:'ก๋วยเตี๋ยวเนื้อน้ำแดงวัดช่องลม', lat:13.5320, lng:99.8030, category:'ก๋วยเตี๋ยว', desc:'ก๋วยเตี๋ยวเนื้อใส่ซอสเย็นตาโฟ หน้าวัดช่องลม ต.หน้าเมือง อ.เมืองราชบุรี เปิดทุกวัน 8.00-14.00 น.', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
+  { id:'r9', title:'ชุนเซ้งข้าวคลุกกะปิ', lat:13.5350, lng:99.8150, category:'อาหารไทย', desc:'ข้าวคลุกกะปิเครื่องแน่น ถ.ศรีสุริยวงศ์ ต.หน้าเมือง อ.เมืองราชบุรี เปิดทุกวัน 7.00-16.00 น.', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
+  { id:'r10', title:'ร้านอาหารไหมไทย (หนามหญ้าโซไซตี้)', lat:13.5600, lng:99.8300, category:'อาหารไทย', desc:'ร้านอาหารไทย-จีน-ยุโรป บรรยากาศสบายๆ มีดนตรีสดทุกคืน ต.ดอนตะโก อ.เมืองราชบุรี', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
+  { id:'r11', title:'เด่นไทยไอศกรีม', lat:13.5312, lng:99.8121, category:'ของหวาน/ไอศกรีม', desc:'ร้านไอศกรีมชื่อดัง ตลาดสนามหญ้า ถ.วรเดช ต.หน้าเมือง อ.เมืองราชบุรี เปิด 14.00-02.00 น.', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:true }, status:'unverified', votes:0, comments:[] },
+  { id:'r12', title:'ก๋วยเตี๋ยวหมูย่าง เฮียแอ๊ด', lat:13.8129, lng:99.8781, category:'ก๋วยเตี๋ยว', desc:'ก๋วยเตี๋ยวหมูย่างเจ้าดังของ อ.บ้านโป่ง น้ำซุปเข้มข้น หมูย่างหมักสูตรร้าน', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
+  { id:'r13', title:'โรงพยาบาลราชบุรี', lat:13.5375, lng:99.8155, category:'โรงพยาบาล', desc:'โรงพยาบาลศูนย์ประจำจังหวัด ขนาด 1,000 เตียง ถ.สมบูรณ์กุล ต.หน้าเมือง อ.เมืองราชบุรี', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:true, wide_door:true, has_night_lighting:true }, status:'verified', votes:20, comments:[] }
 ];
 
 const provinces = [
@@ -355,15 +369,16 @@ provinces.forEach(([val,label])=>{
   provSelect.appendChild(opt);
 });
 
-// เริ่มต้นแผนที่เดิม (MapTiler ของคุณ)
+// เริ่มต้นแผนที่
 const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([13.2, 101.0], 6);
 
+// แผนที่หลัก พร้อมตัวสลับอัตโนมัติหาก MapTiler ติดขัด
 const baseLayer = L.tileLayer('https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=heBoKGgYEE6tSt7eXYza', {
-  maxZoom: 19, attribution: '&copy; MapTiler &copy; OpenStreetMap contributors', crossOrigin: true, updateWhenIdle: true, keepBuffer: 4
+  maxZoom: 19, attribution: '&copy; MapTiler &copy; OpenStreetMap', crossOrigin: true, updateWhenIdle: true
 }).addTo(map);
 
 baseLayer.on('tileerror', (e)=>{
-  setTimeout(()=>{ e.tile.src = e.tile.src; }, 800);
+  e.tile.src = `https://tile.openstreetmap.org/${e.coords.z}/${e.coords.x}/${e.coords.y}.png`;
 });
 
 const ratchaburiOutline = [
@@ -372,16 +387,16 @@ const ratchaburiOutline = [
   [13.85,99.20],[13.95,99.50]
 ];
 const worldBigBox = [[-85,-180],[-85,180],[85,180],[85,-180]];
-const maskLayer = L.polygon([worldBigBox, ratchaburiOutline], { stroke:false, fillColor:'#2E2722', fillOpacity:0.35, interactive:false });
-const outlineLayer = L.polygon(ratchaburiOutline, { color:'#E8DECD', weight:2.5, fill:false, interactive:false });
+const maskLayer = L.polygon([worldBigBox, ratchaburiOutline], { stroke:false, fillColor:'#332822', fillOpacity:0.38, interactive:false });
+const outlineLayer = L.polygon(ratchaburiOutline, { color:'#E8DDCA', weight:2.5, fill:false, interactive:false });
 
 const markers = {};
 function pinIcon(status, category){
-  // หมุดเขียวเซจ / ส้มอิฐ / เทาน้ำตาล
-  const fill = status==='verified' ? '#4E7055' : status==='disputed' ? '#B54F40' : '#A9A296';
+  // หมุดสี Earth Tone: เขียวธรรมชาติ / ส้มอิฐ / น้ำตาลเทา
+  const fill = status==='verified' ? '#4D704C' : status==='disputed' ? '#B24C3D' : '#A89F91';
   const glyph = categoryGlyph(category);
   const svg = `<svg width="30" height="38" viewBox="0 0 30 38" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="15" cy="15" r="13" fill="${fill}" stroke="#fff" stroke-width="2.5"/>
+    <circle cx="15" cy="15" r="13" fill="${fill}" stroke="#FAF7F2" stroke-width="2.5"/>
     <path d="M15 37 L9 21 L21 21 Z" fill="${fill}"/>
     ${glyph}
   </svg>`;
@@ -411,7 +426,7 @@ async function loadFromFirebase(){
     });
     places.forEach(renderMarker);
   } catch(e) {
-    console.warn("ใช้ข้อมูลเริ่มต้นในเครื่อง:", e);
+    console.error("โหลดข้อมูลจาก Firebase ไม่สำเร็จ: ", e);
   }
 }
 
@@ -453,7 +468,7 @@ provSelect.addEventListener('change', (e)=>{
     if(map.hasLayer(maskLayer)) map.removeLayer(maskLayer);
     if(map.hasLayer(outlineLayer)) map.removeLayer(outlineLayer);
   }
-  map.flyTo([lat,lng], zoom, { duration: 1.1 });
+  map.flyTo([lat,lng], zoom, { duration: 1.2 });
   closeSheet();
 });
 
@@ -532,8 +547,13 @@ async function verify(id){
   if(p.status==='unverified') p.status='verified';
   
   try {
-    await db.collection('places').doc(id).set({ votes: p.votes, status: p.status }, { merge: true });
-  } catch(err) { console.error(err); }
+    await db.collection('places').doc(id).set({
+      votes: p.votes,
+      status: p.status
+    }, { merge: true });
+  } catch(err) {
+    console.error("บันทึกการยืนยันไม่สำเร็จ:", err);
+  }
 
   renderMarker(p);
   openSheet(id);
@@ -557,10 +577,13 @@ document.getElementById('btnSaveTags').addEventListener('click', async ()=>{
   document.querySelectorAll('#editTagGrid input').forEach(cb=>{ p.tags[cb.dataset.key] = cb.checked; });
   
   try {
-    showToast('กำลังบันทึกลง Firebase...');
-    await db.collection('places').doc(currentId).set({ tags: p.tags }, { merge: true });
-    showToast('บันทึกลงฐานข้อมูลสำเร็จแล้ว!');
+    showToast('กำลังบันทึกลงฐานข้อมูล...');
+    await db.collection('places').doc(currentId).set({
+      tags: p.tags
+    }, { merge: true });
+    showToast('บันทึกข้อมูลเรียบร้อยแล้ว!');
   } catch(err) {
+    console.error("บันทึกไม่สำเร็จ:", err);
     showToast('บันทึกไม่สำเร็จ');
   }
 
@@ -592,8 +615,12 @@ document.getElementById('commentSend').addEventListener('click', async ()=>{
   p.comments.push({ name:'ผู้ใช้งาน', text });
 
   try {
-    await db.collection('places').doc(currentId).set({ comments: p.comments }, { merge: true });
-  } catch(err) {}
+    await db.collection('places').doc(currentId).set({
+      comments: p.comments
+    }, { merge: true });
+  } catch(err) {
+    console.error("เซฟคอมเมนต์ไม่สำเร็จ:", err);
+  }
 
   input.value = '';
   renderComments(p);
@@ -676,6 +703,7 @@ function showToast(msg){
   setTimeout(()=> t.classList.remove('show'), 2200);
 }
 
+// สั่งคำนวณแผนที่ใหม่ทันทีที่โหลดเสร็จ
 window.addEventListener('load', () => {
   setTimeout(() => { map.invalidateSize(); }, 300);
 });
