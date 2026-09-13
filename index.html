@@ -6,11 +6,11 @@
 <title>SaFE SpaCe — แผนที่การเข้าถึงและพื้นที่ปลอดภัย</title>
 <link rel="icon" type="image/png" href="logomap.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
-
+ 
 <!-- นำเข้า Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
-
+ 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -27,7 +27,7 @@
   body{ font-family:'Sarabun', sans-serif; background:var(--bg-1); color:var(--ink); overflow:hidden; }
   #map{ position:absolute; inset:0; background:var(--bg-2); }
   svg.ic{ width:16px; height:16px; flex:0 0 auto; }
-
+ 
   header{ position:absolute; top:0; left:0; right:0; z-index:1000; padding:14px 16px 10px;
     background:linear-gradient(180deg, rgba(249,248,246,0.97) 65%, rgba(249,248,246,0)); pointer-events:none; }
   header > *{ pointer-events:auto; }
@@ -56,12 +56,12 @@
   .chip.active{ background:var(--sage); border-color:var(--sage); color:#fff; }
   .chip.active svg{ fill:#fff; }
   .chip:focus-visible{ outline:2px solid var(--terracotta); outline-offset:2px; }
-
+ 
   .pin-wrap{ display:flex; flex-direction:column; align-items:center; filter:drop-shadow(0 3px 5px rgba(44,53,49,0.35)); }
   .pin-wrap svg{ display:block; }
   .user-dot{ width:16px; height:16px; border-radius:50%; background:#3B82F6; border:3px solid #fff;
     box-shadow:0 0 0 5px rgba(59,130,246,0.28); }
-
+ 
   #sheet{ position:absolute; z-index:1100; background:#fff; box-shadow:var(--shadow); padding:18px 18px 20px;
     transform:translateY(120%); transition:transform .32s cubic-bezier(.32,.72,0,1); overflow-y:auto; }
   #sheet.open{ transform:translateY(0); }
@@ -95,7 +95,7 @@
   .btn-verify:disabled svg{ fill:#8a8478; }
   .btn-nav{ background:var(--terracotta); color:#fff; }
   .btn-nav:hover{ filter:brightness(1.05); }
-
+ 
   .section-title{ font-family:'Mali',sans-serif; font-weight:700; font-size:14.5px; margin:0 0 10px;
     display:flex; align-items:center; gap:7px; }
   .section-title svg{ fill:var(--terracotta-dark); }
@@ -105,7 +105,7 @@
   .tag-check svg{ fill:var(--sage-dark); }
   .btn-save-tags{ background:var(--terracotta-dark); color:#fff; width:100%; margin-bottom:18px; }
   .btn-save-tags:hover{ filter:brightness(1.05); }
-
+ 
   .comment-item{ background:var(--bg-2); border-radius:12px; padding:9px 12px; margin-bottom:8px; }
   .comment-item .cname{ font-size:12.5px; font-weight:700; color:var(--sage-dark); }
   .comment-item .ctext{ font-size:13.5px; margin-top:2px; }
@@ -115,13 +115,13 @@
   .comment-form button{ min-width:44px; min-height:40px; border-radius:10px; border:none; background:var(--sage);
     color:#fff; font-weight:700; cursor:pointer; }
   .no-comments{ font-size:13px; color:#8a8478; margin-bottom:8px; }
-
+ 
   @media (max-width:768px){ #sheet{ left:0; right:0; bottom:0; border-radius:22px 22px 0 0; max-height:80vh; } }
   @media (min-width:769px){
     #sheet{ left:18px; top:130px; width:340px; max-height:calc(100vh - 160px); border-radius:var(--radius); transform:translateX(-130%); }
     #sheet.open{ transform:translateX(0); }
   }
-
+ 
   #nearbyPanel{ position:absolute; top:130px; right:18px; z-index:1080; width:290px; max-height:calc(100vh - 160px);
     background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; overflow-y:auto;
     transform:translateX(130%); transition:transform .3s cubic-bezier(.32,.72,0,1); }
@@ -138,7 +138,7 @@
   .nearby-item .ni-dist{ font-size:12.5px; font-weight:700; color:var(--sage-dark); white-space:nowrap; }
   @media (max-width:768px){ #nearbyPanel{ left:16px; right:16px; width:auto; top:auto; bottom:16px; max-height:46vh; transform:translateY(130%); }
     #nearbyPanel.open{ transform:translateY(0); } }
-
+ 
   #searchFab{ position:absolute; right:18px; bottom:24px; z-index:1090; width:54px; height:54px; border-radius:50%;
     border:none; background:var(--ink); box-shadow:var(--shadow); cursor:pointer; display:flex; align-items:center;
     justify-content:center; }
@@ -156,21 +156,21 @@
   .search-item .si-cat{ font-size:11.5px; font-weight:400; color:#8a8478; }
   .search-empty{ font-size:12.5px; color:#8a8478; padding:6px 4px; }
   @media (max-width:768px){ #searchPanel{ left:16px; right:16px; width:auto; bottom:88px; } }
-
+ 
   #toast{ position:absolute; bottom:24px; left:50%; transform:translate(-50%,20px); background:var(--ink); color:#fff;
     font-size:13.5px; font-weight:600; padding:11px 18px; border-radius:999px; z-index:1400; opacity:0;
     pointer-events:none; transition:opacity .25s ease, transform .25s ease; box-shadow:var(--shadow); }
   #toast.show{ opacity:1; transform:translate(-50%,0); }
   .leaflet-control-zoom{ margin-top:130px !important; }
-
+ 
   /* แก้บั๊กแผนที่เป็นลายตาราง: ทำสีเขียวโทนเดียวด้วย filter (ไม่พึ่ง div ซ้อนที่ขนาดไม่ครอบคลุมทุก tile) */
   .leaflet-tile{ filter: grayscale(100%) sepia(40%) hue-rotate(60deg) saturate(120%) brightness(1.03); }
 </style>
 </head>
 <body>
-
+ 
 <div id="map"></div>
-
+ 
 <header>
   <div class="top-row">
     <div class="brand"><span class="dot"></span>SaFE SpaCe</div>
@@ -184,14 +184,14 @@
   </div>
   <div class="filters" id="filters" role="group" aria-label="ตัวกรองการเข้าถึง"></div>
 </header>
-
+ 
 <div id="nearbyPanel">
   <button class="closeBtn" id="nearbyClose" aria-label="ปิด">✕</button>
   <h3>ร้านใกล้คุณ</h3>
   <div class="sub" id="nearbySub"></div>
   <div id="nearbyList"></div>
 </div>
-
+ 
 <div id="sheet" role="dialog" aria-modal="false" aria-labelledby="sheetTitle">
   <button class="closeBtn" id="sheetClose" aria-label="ปิด">✕</button>
   <span class="status-badge" id="sheetStatus"></span>
@@ -205,11 +205,11 @@
     <button class="btn btn-verify" id="btnVerify"></button>
     <button class="btn btn-nav" id="btnNav"></button>
   </div>
-
+ 
   <div class="section-title" id="editTagsTitle">ช่วยเติม/แก้ไขข้อมูลการเข้าถึง</div>
   <div class="tag-grid" id="editTagGrid"></div>
   <button class="btn btn-save-tags" id="btnSaveTags">บันทึกข้อมูลการเข้าถึง</button>
-
+ 
   <div class="section-title" id="commentsTitle">ความคิดเห็น</div>
   <div id="commentList"></div>
   <div class="comment-form">
@@ -217,15 +217,15 @@
     <button id="commentSend">ส่ง</button>
   </div>
 </div>
-
+ 
 <button id="searchFab" aria-label="ค้นหาร้าน"><svg viewBox="0 0 20 20" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="9" r="6"/><path d="M14 14l4 4"/></svg></button>
 <div id="searchPanel">
   <input type="text" id="searchInput" placeholder="ค้นหาชื่อร้าน...">
   <div id="searchResults"></div>
 </div>
-
+ 
 <div id="toast"></div>
-
+ 
 <script>
 // ---------- เริ่มต้นใช้งาน Firebase ----------
 const firebaseConfig = {
@@ -237,10 +237,10 @@ const firebaseConfig = {
   appId: "1:256045341561:web:a67e560b81526adf916da8",
   measurementId: "G-9WKP21SH2T"
 };
-
+ 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
+ 
 // ---------- ไอคอน SVG กลางระบบ ----------
 const ICONS = {
   ramp: '<svg class="ic" viewBox="0 0 20 20"><path d="M2 17h16v1H2z"/><path d="M2 17L13 6h2L4 17z"/><circle cx="4.6" cy="15.6" r="1.4"/></svg>',
@@ -258,10 +258,10 @@ const TAG_LABELS = {
   has_elevator:'ลิฟต์', wide_door:'ประตูกว้าง ≥80cm', has_night_lighting:'ไฟส่องสว่างกลางคืน'
 };
 const TAG_ICON_KEY = { has_ramp:'ramp', has_gender_neutral_toilet:'toilet', has_elevator:'elevator', wide_door:'door', has_night_lighting:'light' };
-
+ 
 document.getElementById('editTagsTitle').innerHTML = ICONS.wrench + 'ช่วยเติม/แก้ไขข้อมูลการเข้าถึง';
 document.getElementById('commentsTitle').innerHTML = ICONS.comment + 'ความคิดเห็น';
-
+ 
 function categoryGlyph(category){
   switch(category){
     case 'อาหารไทย': return `<g fill="#fff"><ellipse cx="15" cy="9.3" rx="2.1" ry="3.7"/><ellipse cx="15" cy="9.3" rx="2.1" ry="3.7" transform="rotate(72 15 13)"/><ellipse cx="15" cy="9.3" rx="2.1" ry="3.7" transform="rotate(144 15 13)"/><ellipse cx="15" cy="9.3" rx="2.1" ry="3.7" transform="rotate(216 15 13)"/><ellipse cx="15" cy="9.3" rx="2.1" ry="3.7" transform="rotate(288 15 13)"/><circle cx="15" cy="13" r="1.5"/></g>`;
@@ -275,7 +275,7 @@ function categoryGlyph(category){
     default: return '';
   }
 }
-
+ 
 // ข้อมูลเริ่มต้น
 let places = [
   { id:'r1', title:'ครัวคุณต๋อย 1935', lat:13.5363, lng:99.8175, category:'อาหารไทย', desc:'ร้านอาหารไทยชื่อดังติดสถานีรถไฟ อ.เมืองราชบุรี บรรยากาศย้อนยุค', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:false, has_elevator:false, wide_door:true, has_night_lighting:true }, status:'verified', votes:8, comments:[] },
@@ -292,7 +292,7 @@ let places = [
   { id:'r12', title:'ก๋วยเตี๋ยวหมูย่าง เฮียแอ๊ด', lat:13.8129, lng:99.8781, category:'ก๋วยเตี๋ยว', desc:'ก๋วยเตี๋ยวหมูย่างเจ้าดังของ อ.บ้านโป่ง น้ำซุปเข้มข้น หมูย่างหมักสูตรร้าน', photo:null, tags:{ has_ramp:false, has_gender_neutral_toilet:false, has_elevator:false, wide_door:false, has_night_lighting:false }, status:'unverified', votes:0, comments:[] },
   { id:'r13', title:'โรงพยาบาลราชบุรี', lat:13.5375, lng:99.8155, category:'โรงพยาบาล', desc:'โรงพยาบาลศูนย์ประจำจังหวัด ขนาด 1,000 เตียง ถ.สมบูรณ์กุล ต.หน้าเมือง อ.เมืองราชบุรี', photo:null, tags:{ has_ramp:true, has_gender_neutral_toilet:true, has_elevator:true, wide_door:true, has_night_lighting:true }, status:'verified', votes:20, comments:[] }
 ];
-
+ 
 const provinces = [
   ['thailand','🇹🇭 ประเทศไทย (ภาพรวม)', 13.2, 101.0, 6],
   ['ratchaburi','📍 จ.ราชบุรี', 13.5282, 99.8134, 11],
@@ -310,23 +310,23 @@ const provinces = [
   ['สมุทรสงคราม',null,13.4098,100.0022,10],['เพชรบุรี',null,13.1119,99.9398,9],
   ['ประจวบคีรีขันธ์',null,11.8125,99.7957,8],['นครราชสีมา',null,14.9799,102.0977,8]
 ];
-
+ 
 const provSelect = document.getElementById('provinceSelect');
 provinces.forEach(([val,label])=>{
   const opt = document.createElement('option');
   opt.value = val; opt.textContent = label || val;
   provSelect.appendChild(opt);
 });
-
+ 
 const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([13.2, 101.0], 6);
-const baseLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-  maxZoom: 19, attribution: 'Tiles &copy; Esri', crossOrigin: true, updateWhenIdle: true, keepBuffer: 4
+const baseLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19, attribution: '&copy; OpenStreetMap contributors', crossOrigin: true, updateWhenIdle: true, keepBuffer: 4
 }).addTo(map);
 // บาง tile อาจโหลดพลาดชั่วคราว (เครือข่าย) — สั่งให้ลองโหลดซ้ำอัตโนมัติแทนที่จะปล่อยว่างค้างไว้
 baseLayer.on('tileerror', (e)=>{
   setTimeout(()=>{ e.tile.src = e.tile.src; }, 800);
 });
-
+ 
 const ratchaburiOutline = [
   [13.90,99.75],[13.85,99.95],[13.70,100.05],[13.45,100.05],[13.20,99.95],
   [13.05,99.75],[13.05,99.45],[13.20,99.15],[13.45,99.05],[13.65,99.05],
@@ -335,7 +335,7 @@ const ratchaburiOutline = [
 const worldBigBox = [[5,90],[5,112],[25,112],[25,90]];
 const maskLayer = L.polygon([worldBigBox, ratchaburiOutline], { stroke:false, fillColor:'#2C3531', fillOpacity:0.45, interactive:false });
 const outlineLayer = L.polygon(ratchaburiOutline, { color:'#F3EFEA', weight:2.5, fill:false, interactive:false });
-
+ 
 const markers = {};
 function pinIcon(status, category){
   const fill = status==='verified' ? '#6A8E72' : status==='disputed' ? '#B84A39' : '#B7B2A8';
@@ -347,14 +347,14 @@ function pinIcon(status, category){
   </svg>`;
   return L.divIcon({ html:`<div class="pin-wrap">${svg}</div>`, className:'', iconSize:[30,38], iconAnchor:[15,37] });
 }
-
+ 
 function renderMarker(p){
   if(markers[p.id]) map.removeLayer(markers[p.id]);
   const m = L.marker([p.lat, p.lng], { icon: pinIcon(p.status, p.category) }).addTo(map);
   m.on('click', ()=> openSheet(p.id));
   markers[p.id] = m;
 }
-
+ 
 // ฟังก์ชันโหลดข้อมูลล่าสุดจาก Firebase
 async function loadFromFirebase(){
   try {
@@ -374,10 +374,10 @@ async function loadFromFirebase(){
     console.error("โหลดข้อมูลจาก Firebase ล้มเหลว: ", e);
   }
 }
-
+ 
 places.forEach(renderMarker);
 loadFromFirebase(); // ดึงข้อมูลจาก Cloud Firestore ทันที
-
+ 
 const filtersEl = document.getElementById('filters');
 Object.entries(TAG_LABELS).forEach(([key,label])=>{
   const chip = document.createElement('button');
@@ -385,7 +385,7 @@ Object.entries(TAG_LABELS).forEach(([key,label])=>{
   chip.innerHTML = ICONS[TAG_ICON_KEY[key]] + `<span>${label}</span>`;
   filtersEl.appendChild(chip);
 });
-
+ 
 const catSelect = document.getElementById('categorySelect');
 function refreshCategoryOptions(){
   const cats = [...new Set(places.map(p=>p.category).filter(Boolean))];
@@ -399,7 +399,7 @@ function refreshCategoryOptions(){
 }
 refreshCategoryOptions();
 catSelect.addEventListener('change', applyFilters);
-
+ 
 provSelect.addEventListener('change', (e)=>{
   const val = e.target.value;
   const entry = provinces.find(p=>p[0]===val);
@@ -415,7 +415,7 @@ provSelect.addEventListener('change', (e)=>{
   map.flyTo([lat,lng], zoom, { duration: 1.1 });
   closeSheet();
 });
-
+ 
 const activeFilters = new Set();
 document.querySelectorAll('.chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{
@@ -425,7 +425,7 @@ document.querySelectorAll('.chip').forEach(chip=>{
     applyFilters();
   });
 });
-
+ 
 function applyFilters(){
   const catFilter = catSelect.value;
   places.forEach(p=>{
@@ -436,11 +436,11 @@ function applyFilters(){
     else { if(map.hasLayer(m)) map.removeLayer(m); if(currentId===p.id) closeSheet(); }
   });
 }
-
+ 
 const verifiedByMe = new Set();
 let currentId = null;
 const sheet = document.getElementById('sheet');
-
+ 
 function openSheet(id){
   const p = places.find(x=>x.id===id);
   if(!p) return;
@@ -470,7 +470,7 @@ function openSheet(id){
   renderComments(p);
   sheet.classList.add('open');
 }
-
+ 
 function renderPills(p){
   const pillRow = document.getElementById('sheetPills');
   pillRow.innerHTML = '';
@@ -478,11 +478,11 @@ function renderPills(p){
   if(!active.length){ pillRow.innerHTML = '<span class="pill-empty">ยังไม่มีข้อมูลการเข้าถึง — ช่วยเติมข้อมูลด้านล่างได้เลย</span>'; return; }
   active.forEach(([k,label])=>{ const s=document.createElement('span'); s.className='pill'; s.innerHTML = ICONS[TAG_ICON_KEY[k]] + `<span>${label}</span>`; pillRow.appendChild(s); });
 }
-
+ 
 function closeSheet(){ sheet.classList.remove('open'); currentId=null; }
 document.getElementById('sheetClose').addEventListener('click', closeSheet);
 map.on('click', closeSheet);
-
+ 
 // ฟังก์ชันยืนยันข้อมูล + เซฟลง Firebase
 async function verify(id){
   if(verifiedByMe.has(id)) return;
@@ -499,12 +499,12 @@ async function verify(id){
   } catch(err) {
     console.error("เซฟการยืนยันไม่สำเร็จ:", err);
   }
-
+ 
   renderMarker(p);
   openSheet(id);
   showToast('ขอบคุณสำหรับการยืนยันข้อมูล!');
 }
-
+ 
 function renderEditTags(p){
   const grid = document.getElementById('editTagGrid');
   grid.innerHTML = '';
@@ -515,7 +515,7 @@ function renderEditTags(p){
     grid.appendChild(lab);
   });
 }
-
+ 
 // บันทึกข้อมูลการเข้าถึง (TAGS) ลง Firebase Firestore ทันที!
 document.getElementById('btnSaveTags').addEventListener('click', async ()=>{
   if(!currentId) return;
@@ -532,11 +532,11 @@ document.getElementById('btnSaveTags').addEventListener('click', async ()=>{
     console.error("บันทึกไม่สำเร็จ:", err);
     showToast('บันทึกไม่สำเร็จ ตรวจสอบ Rules ของ Firebase');
   }
-
+ 
   renderPills(p);
   applyFilters();
 });
-
+ 
 function renderComments(p){
   const list = document.getElementById('commentList');
   list.innerHTML = '';
@@ -551,7 +551,7 @@ function renderComments(p){
     });
   }
 }
-
+ 
 // ส่งความคิดเห็น + เซฟลง Firebase
 document.getElementById('commentSend').addEventListener('click', async ()=>{
   const input = document.getElementById('commentInput');
@@ -560,7 +560,7 @@ document.getElementById('commentSend').addEventListener('click', async ()=>{
   const p = places.find(x=>x.id===currentId);
   if(!p.comments) p.comments = [];
   p.comments.push({ name:'ผู้ใช้งาน', text });
-
+ 
   try {
     await db.collection('places').doc(currentId).set({
       comments: p.comments
@@ -568,13 +568,13 @@ document.getElementById('commentSend').addEventListener('click', async ()=>{
   } catch(err) {
     console.error("เซฟคอมเมนต์ไม่สำเร็จ:", err);
   }
-
+ 
   input.value = '';
   renderComments(p);
 });
-
+ 
 function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-
+ 
 let userMarker = null;
 const nearbyPanel = document.getElementById('nearbyPanel');
 document.getElementById('locateBtn').addEventListener('click', ()=>{
@@ -590,13 +590,13 @@ document.getElementById('locateBtn').addEventListener('click', ()=>{
     showToast('ไม่สามารถเข้าถึงตำแหน่งได้ กรุณาอนุญาตการเข้าถึงตำแหน่ง');
   }, { enableHighAccuracy:true, timeout:10000 });
 });
-
+ 
 function haversineKm(lat1,lng1,lat2,lng2){
   const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
   const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
-
+ 
 function showNearby(lat,lng){
   const withDist = places.map(p=>({ p, d: haversineKm(lat,lng,p.lat,p.lng) }))
     .filter(x=>x.d <= 100).sort((a,b)=>a.d-b.d).slice(0,10);
@@ -615,7 +615,7 @@ function showNearby(lat,lng){
   nearbyPanel.classList.add('open');
 }
 document.getElementById('nearbyClose').addEventListener('click', ()=> nearbyPanel.classList.remove('open'));
-
+ 
 const searchFab = document.getElementById('searchFab');
 const searchPanel = document.getElementById('searchPanel');
 const searchInput = document.getElementById('searchInput');
@@ -623,7 +623,7 @@ searchFab.addEventListener('click', ()=>{
   searchPanel.classList.toggle('open');
   if(searchPanel.classList.contains('open')){ searchInput.focus(); renderSearchResults(''); }
 });
-
+ 
 function renderSearchResults(q){
   const results = document.getElementById('searchResults');
   const query = q.trim().toLowerCase();
@@ -643,7 +643,7 @@ function renderSearchResults(q){
   });
 }
 searchInput.addEventListener('input', ()=> renderSearchResults(searchInput.value));
-
+ 
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
